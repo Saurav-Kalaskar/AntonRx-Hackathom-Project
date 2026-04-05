@@ -26,6 +26,8 @@ def run() -> None:
 
     # Core routes
     checks.append(("GET /", client.get("/", follow_redirects=False).status_code == 307))
+    checks.append(("GET /login", client.get("/login").status_code == 200))
+    checks.append(("GET /auth/callback", client.get("/auth/callback").status_code == 200))
     checks.append(("GET /matrix", client.get("/matrix").status_code == 200))
     checks.append(("GET /copilot", client.get("/copilot").status_code == 200))
     checks.append(("GET /history", client.get("/history").status_code == 200))
@@ -37,6 +39,11 @@ def run() -> None:
     checks.append(("GET /health 200", health.status_code == 200))
     checks.append(("RAG ready", bool(health_json.get("rag_ready"))))
     checks.append(("Indexed chunks > 0", int(health_json.get("indexed_chunks", 0)) > 0))
+
+    auth_config = client.get("/auth/config")
+    auth_config_json = auth_config.json()
+    checks.append(("GET /auth/config 200", auth_config.status_code == 200))
+    checks.append(("Auth config returns enabled flag", "enabled" in auth_config_json))
 
     # Matrix API
     matrix_all = client.get("/api/matrix").json().get("matrix", [])
@@ -129,6 +136,7 @@ def run() -> None:
     test_html = client.get("/static/test.html").text
 
     checks.append(("Matrix page has search input", 'id="matrix-search"' in matrix_html))
+    checks.append(("Matrix page loads auth bootstrap", '/static/auth.js' in matrix_html))
     checks.append(("Matrix page title links to matrix", '<a href="/matrix" class="hover:opacity-90 transition-opacity">Time-to-Therapy</a>' in matrix_html))
     checks.append(("Matrix page has mobile hamburger button", 'id="mobile-menu-button"' in matrix_html))
     checks.append(("Matrix page has mobile nav menu", 'id="mobile-nav-menu"' in matrix_html))
@@ -151,6 +159,7 @@ def run() -> None:
     checks.append(("Matrix page has comparison table body", 'id="compare-tbody"' in matrix_html))
     checks.append(("Matrix page calls matrix compare API", '/api/matrix/compare' in matrix_html))
     checks.append(("Copilot page posts to /draft", 'fetch("/draft"' in copilot_html))
+    checks.append(("Copilot page loads auth bootstrap", '/static/auth.js' in copilot_html))
     checks.append(("Copilot body title links to matrix", '<a href="/matrix" class="hover:opacity-90 transition-opacity">Time-to-Therapy</a>' in copilot_html))
     checks.append(("Copilot page has mobile hamburger button", 'id="mobile-menu-button"' in copilot_html))
     checks.append(("Copilot page has mobile nav menu", 'id="mobile-nav-menu"' in copilot_html))
@@ -173,6 +182,7 @@ def run() -> None:
     checks.append(("Copilot page supports PDF export", 'exportDraftAsPdf' in copilot_html))
     checks.append(("Copilot page supports CSV export", 'exportDraftAsCsv' in copilot_html))
     checks.append(("History page fetches /api/history", 'fetch("/api/history"' in history_html))
+    checks.append(("History page loads auth bootstrap", '/static/auth.js' in history_html))
     checks.append(("History page title links to matrix", '<a href="/matrix" class="hover:opacity-90 transition-opacity">Time-to-Therapy</a>' in history_html))
     checks.append(("History page has mobile hamburger button", 'id="mobile-menu-button"' in history_html))
     checks.append(("History page has mobile nav menu", 'id="mobile-nav-menu"' in history_html))

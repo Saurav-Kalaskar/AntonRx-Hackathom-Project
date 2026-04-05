@@ -23,7 +23,7 @@ os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "0"
 os.environ["HF_HUB_DISABLE_FAST_DOWNLOAD"] = "1"
 # ─────────────────────────────────────────────────────────────────────────────
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse
@@ -33,12 +33,14 @@ from typing import List, Dict, Any
 try:
     from .generator.drafter import PADrafter
     from .pipeline.rag_engine import RAGEngine
+    from .auth import require_auth, get_auth_public_config, get_auth_settings
 except ImportError as exc:
     if "attempted relative import with no known parent package" not in str(exc):
         raise
     # Fallback for running this file directly from backend/.
     from generator.drafter import PADrafter
     from pipeline.rag_engine import RAGEngine
+    from auth import require_auth, get_auth_public_config, get_auth_settings
 
 app = FastAPI(
     title="Time-to-Therapy API",
@@ -210,7 +212,20 @@ class DraftResponse(BaseModel):
 
 @app.get("/", include_in_schema=False)
 async def index():
+    auth_settings = get_auth_settings()
+    if auth_settings.get("enabled"):
+        return RedirectResponse(url="/login")
     return RedirectResponse(url="/matrix")
+
+
+@app.get("/login", include_in_schema=False)
+async def login_page():
+    return FileResponse(os.path.join(frontend_dir, "login.html"))
+
+
+@app.get("/auth/callback", include_in_schema=False)
+async def auth_callback_page():
+    return FileResponse(os.path.join(frontend_dir, "login.html"))
 
 
 @app.get("/matrix", include_in_schema=False)
@@ -228,6 +243,11 @@ async def history_page():
     return FileResponse(os.path.join(frontend_dir, "history.html"))
 
 
+@app.get("/auth/config")
+async def auth_config():
+    return get_auth_public_config()
+
+
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 
 @app.get("/health")
@@ -242,7 +262,7 @@ async def health_check():
 
 
 @app.post("/draft", response_model=DraftResponse)
-async def create_draft(request: DraftRequest):
+async def create_draft(request: DraftRequest, _user: Dict[str, Any] | None = Depends(require_auth)):
     try:
         # Semantic search to retrieve relevant policy clauses
         query_text = (
@@ -297,7 +317,7 @@ async def create_draft(request: DraftRequest):
 
 
 @app.get("/api/history")
-async def get_history():
+async def get_history(_user: Dict[str, Any] | None = Depends(require_auth)):
     try:
         cursor.execute(
             "SELECT id, payer_name, patient_context, draft_content, retrieved_rules, timestamp "
@@ -320,18 +340,28 @@ async def get_history():
 
 
 @app.get("/api/matrix")
-async def get_matrix(query: str = "", payer: str = "", category: str = ""):
+async def get_matrix(
+    query: str = "",
+    payer: str = "",
+    category: str = "",
+    _user: Dict[str, Any] | None = Depends(require_auth),
+):
     matrix = rag_engine.build_matrix(query=query, payer=payer, category=category)
     return {"matrix": matrix}
 
 
 @app.get("/api/matrix/categories")
-async def get_matrix_categories():
+async def get_matrix_categories(_user: Dict[str, Any] | None = Depends(require_auth)):
     return {"categories": rag_engine.list_categories()}
 
 
 @app.get("/api/matrix/compare")
-async def get_matrix_compare(query: str = "", category: str = "", limit: int = 8):
+async def get_matrix_compare(
+    query: str = "",
+    category: str = "",
+    limit: int = 8,
+    _user: Dict[str, Any] | None = Depends(require_auth),
+):
     rows = rag_engine.build_matrix(query=query, payer="", category=category)
     if not rows:
         return {"payers": [], "comparison": [], "total_medications": 0}
@@ -396,7 +426,7 @@ async def get_matrix_compare(query: str = "", category: str = "", limit: int = 8
 
 
 @app.get("/api/oncology-search")
-async def oncology_search(drug: str = ""):
+async def oncology_search(drug: str = "", _user: Dict[str, Any] | None = Depends(require_auth)):
     sanitized = _sanitize_search_term(drug)
     if not sanitized:
         return {

@@ -151,6 +151,8 @@ Current examples include payer policy text files (Aetna, UHC, Cigna).
 ## API Endpoints
 - `GET /health`
   - Health and indexing status.
+- `GET /auth/config`
+  - Returns frontend-safe authentication settings.
 - `GET /api/matrix?query=<text>&payer=<name>`
   - Returns coverage rows derived from indexed policy records.
 - `POST /draft`
@@ -167,11 +169,29 @@ Create a root `.env` file (already supported by project env loader):
 NVIDIA_API_KEY=your_key_here
 STRICT_LLM_MODE=true
 ALLOWED_ORIGINS=https://frontend-app.example
+
+# Auth0 (set AUTH_ENABLED=true to enforce login)
+AUTH_ENABLED=true
+AUTH0_DOMAIN=tenant-name.region.auth0.com
+AUTH0_CLIENT_ID=your_auth0_spa_client_id
+AUTH0_AUDIENCE=your_backend_api_identifier
+AUTH0_CALLBACK_PATH=/auth/callback
+AUTH0_LOGOUT_RETURN_PATH=/login
 ```
 
 Notes:
 - In strict mode, missing/failed LLM calls raise runtime errors.
 - `.env` is excluded from git; use `.env.example` as template.
+
+### Auth0 Sign In + Create Account Flow
+- Startup route behavior:
+  - If `AUTH_ENABLED=true`, app entry redirects to `/login`.
+  - If `AUTH_ENABLED=false`, app entry redirects to `/matrix`.
+- `login.html` provides two clinician actions:
+  - `Sign In` (Auth0 login redirect)
+  - `Create Account` (Auth0 signup redirect with `screen_hint=signup`)
+- When authenticated, frontend pages call protected backend APIs using Bearer tokens from Auth0.
+- Backend verifies Auth0 JWTs on protected routes using issuer, audience, and Auth0 JWKS.
 
 ## Local Run
 1. Install dependencies:
