@@ -50,13 +50,13 @@ The application combines three capabilities in one workflow:
 ### High-Level Architecture
 ```mermaid
 flowchart LR
-  Clinician[Clinician User]
-  Frontend[Frontend Web UI\nMatrix | Copilot | History]
-  Backend[Backend API Layer\nFastAPI]
-  VectorDB[(Vector DB\nQdrant In-Memory Index)]
-  AppDB[(Application DB\nSQLite History)]
-  PolicyDocs[(Policy Corpus\nDocument Files)]
-  LLM[LLM Inference Service\nNVIDIA NIM]
+  Clinician["Clinician User"]
+  Frontend["Frontend Web UI<br/>Matrix, Copilot, History"]
+  Backend["Backend API Layer<br/>FastAPI"]
+  VectorDB["Vector DB<br/>Qdrant In-Memory Index"]
+  AppDB["Application DB<br/>SQLite History"]
+  PolicyDocs["Policy Corpus<br/>Document Files"]
+  LLM["LLM Inference Service<br/>NVIDIA NIM"]
 
   Clinician --> Frontend
   Frontend --> Backend
@@ -70,36 +70,36 @@ flowchart LR
 ### Low-Level Architecture
 ```mermaid
 flowchart TB
-  subgraph FrontendLayer[Frontend Layer]
-    MatrixPage[matrix.html\nCoverage comparison]
-    CopilotPage[copilot.html\nPA drafting workflow]
-    HistoryPage[history.html\nDraft history review]
+  subgraph FrontendLayer["Frontend Layer"]
+    MatrixPage["matrix.html<br/>Coverage comparison"]
+    CopilotPage["copilot.html<br/>PA drafting workflow"]
+    HistoryPage["history.html<br/>Draft history review"]
   end
 
-  subgraph APILayer[Backend API Layer - backend/main.py]
-    HealthAPI[GET /health]
-    MatrixAPI[GET /api/matrix\nGET /api/matrix/compare\nGET /api/matrix/categories]
-    DraftAPI[POST /draft]
-    HistoryAPI[GET /api/history]
-    PolicyFileAPI[GET /policies/:filename]
+  subgraph APILayer["Backend API Layer - backend/main.py"]
+    HealthAPI["GET /health"]
+    MatrixAPI["GET /api/matrix<br/>GET /api/matrix/compare<br/>GET /api/matrix/categories"]
+    DraftAPI["POST /draft"]
+    HistoryAPI["GET /api/history"]
+    PolicyFileAPI["GET /policies/:filename"]
   end
 
-  subgraph ServiceLayer[Service Layer]
-    RAG[RAGEngine\nbackend/pipeline/rag_engine.py]
-    Drafter[PADrafter\nbackend/generator/drafter.py]
-    Env[env_loader.py]
+  subgraph ServiceLayer["Service Layer"]
+    RAG["RAGEngine<br/>backend/pipeline/rag_engine.py"]
+    Drafter["PADrafter<br/>backend/generator/drafter.py"]
+    Env["env_loader.py"]
   end
 
-  subgraph DataLayer[Data Layer]
-    PolicyFiles[(backend/pipeline/documents)]
-    Schema[(backend/schema/policy.json)]
-    DLQ[(backend/pipeline/dlq.jsonl)]
-    VectorIndex[(Qdrant Vector Index)]
-    DraftHistory[(backend/history.db)]
+  subgraph DataLayer["Data Layer"]
+    PolicyFiles["backend/pipeline/documents"]
+    Schema["backend/schema/policy.json"]
+    DLQ["backend/pipeline/dlq.jsonl"]
+    VectorIndex["Qdrant Vector Index"]
+    DraftHistory["backend/history.db"]
   end
 
-  subgraph ExternalLayer[External Dependency]
-    Nemotron[NVIDIA Nemotron\nOpenAI-Compatible Endpoint]
+  subgraph ExternalLayer["External Dependency"]
+    Nemotron["NVIDIA Nemotron<br/>OpenAI-Compatible Endpoint"]
   end
 
   MatrixPage --> MatrixAPI
