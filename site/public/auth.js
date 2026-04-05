@@ -78,6 +78,12 @@
     }
   }
 
+  function setPoweredByLabel(message) {
+    const label = document.getElementById("auth-powered-label");
+    if (!label) return;
+    label.textContent = message;
+  }
+
   function setFormError(message) {
     const node = document.getElementById("auth-form-error");
     if (!node) return;
@@ -384,6 +390,14 @@
     authState.audience = config.audience || "";
     authState.callbackPath = config.callbackPath || "/auth/callback";
     authState.logoutReturnPath = config.logoutReturnPath || LOGIN_PATH;
+
+    if (!authState.enabled) {
+      setPoweredByLabel("Authorization powered by Auth0");
+    } else if (authState.provider === "auth0") {
+      setPoweredByLabel("Authorization powered by Auth0");
+    } else {
+      setPoweredByLabel("Authorization powered by Auth0 (local fallback active)");
+    }
 
     window.AppAuth = {
       enabled: authState.enabled,
