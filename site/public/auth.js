@@ -25,7 +25,10 @@
   function ensureAuthButtons() {
     const signInBtn = document.getElementById("auth-signin-btn");
     const signUpBtn = document.getElementById("auth-signup-btn");
-    const logoutBtn = document.getElementById("auth-logout-btn");
+    const logoutButtons = [
+      ...document.querySelectorAll("[data-auth-logout]"),
+      ...document.querySelectorAll("#auth-logout-btn"),
+    ];
 
     if (signInBtn) {
       signInBtn.addEventListener("click", () => {
@@ -45,9 +48,11 @@
         login(true);
       });
     }
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => logout());
-    }
+    logoutButtons.forEach((btn) => {
+      if (!btn || btn.dataset.logoutWired === "1") return;
+      btn.addEventListener("click", () => logout());
+      btn.dataset.logoutWired = "1";
+    });
   }
 
   function setBanner(message, tone) {
