@@ -20,7 +20,7 @@ def _env_bool(name: str, default: bool = False) -> bool:
 
 
 def get_auth_settings() -> Dict[str, Any]:
-    enabled = _env_bool("AUTH_ENABLED", False)
+    enabled = _env_bool("AUTH_ENABLED", True)
     domain = (os.getenv("AUTH0_DOMAIN") or "").strip()
     client_id = (os.getenv("AUTH0_CLIENT_ID") or "").strip()
     audience = (os.getenv("AUTH0_AUDIENCE") or "").strip()
@@ -33,10 +33,14 @@ def get_auth_settings() -> Dict[str, Any]:
         logout_return_path = f"/{logout_return_path}"
 
     configured = bool(domain and client_id and audience)
+    provider = "auth0" if configured else "local"
+    if not enabled:
+        provider = "none"
 
     return {
         "enabled": enabled,
         "configured": configured,
+        "provider": provider,
         "domain": domain,
         "client_id": client_id,
         "audience": audience,
@@ -51,6 +55,7 @@ def get_auth_public_config() -> Dict[str, Any]:
     return {
         "enabled": settings["enabled"],
         "configured": settings["configured"],
+        "provider": settings["provider"],
         "domain": settings["domain"],
         "clientId": settings["client_id"],
         "audience": settings["audience"],
@@ -133,13 +138,21 @@ def verify_app_session_token(session_token: str, settings: Dict[str, Any]) -> Op
         return None
 
 
+def get_app_session_user(request: Request) -> Optional[Dict[str, Any]]:
+    settings = get_auth_settings()
+    if not settings.get("enabled"):
+        return None
+
+    token = request.cookies.get(SESSION_COOKIE_NAME) or ""
+    return verify_app_session_token(token, settings)
+
+
 def has_valid_app_session(request: Request) -> bool:
     settings = get_auth_settings()
     if not settings.get("enabled"):
         return True
 
-    token = request.cookies.get(SESSION_COOKIE_NAME) or ""
-    payload = verify_app_session_token(token, settings)
+    payload = get_app_session_user(request)
     if not payload:
         return False
 
@@ -248,6 +261,17 @@ async def require_auth(request: Request) -> Optional[Dict[str, Any]]:
     settings = get_auth_settings()
     if not settings["enabled"]:
         return None
+
+    session_payload = get_app_session_user(request)
+    if session_payload:
+        request.state.user = session_payload
+        return session_payload
+
+    if settings.get("provider") != "auth0":
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication required.",
+        )
 
     authorization = request.headers.get("Authorization") or ""
     if not authorization.startswith("Bearer "):

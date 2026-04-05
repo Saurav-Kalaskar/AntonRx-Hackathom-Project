@@ -10,7 +10,10 @@
     body {
       font-family: 'Inter', sans-serif;
       min-height: 100dvh;
-      background: radial-gradient(circle at 20% 20%, #d8fff8 0%, #f3f6fb 45%, #eef2f9 100%);
+      background:
+        radial-gradient(circle at 12% 18%, #c9fff0 0%, rgba(201, 255, 240, 0) 42%),
+        radial-gradient(circle at 90% 82%, #cde4ff 0%, rgba(205, 228, 255, 0) 44%),
+        linear-gradient(165deg, #f5faf8 0%, #edf4fb 45%, #f7fafb 100%);
     }
     .font-headline { font-family: 'Manrope', sans-serif; }
     .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24; }
@@ -18,37 +21,100 @@
   <script src="/static/auth.js" defer></script>
 </head>
 <body class="text-slate-900">
-  <main class="min-h-screen flex items-center justify-center px-4 py-8">
-    <section class="w-full max-w-xl rounded-2xl border border-teal-100 bg-white/90 backdrop-blur p-8 shadow-xl">
-      <div class="flex items-center gap-3 mb-5">
-        <span class="material-symbols-outlined text-teal-700 text-3xl">clinical_notes</span>
-        <h1 class="text-3xl font-headline font-extrabold text-teal-900">Time-to-Therapy</h1>
+  <div class="absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-24 -left-16 h-64 w-64 rounded-full bg-emerald-200/50 blur-2xl"></div>
+    <div class="absolute -bottom-24 -right-16 h-72 w-72 rounded-full bg-blue-200/50 blur-2xl"></div>
+  </div>
+
+  <main class="min-h-screen px-4 py-8 md:px-8 md:py-10 lg:px-10 lg:py-12 flex items-center">
+    <section class="mx-auto w-full max-w-6xl rounded-3xl border border-teal-100/70 bg-white/75 shadow-2xl shadow-teal-100/60 backdrop-blur-xl overflow-hidden">
+      <div class="grid lg:grid-cols-[1.05fr_0.95fr]">
+        <div class="relative px-7 py-10 md:px-12 md:py-14 bg-gradient-to-br from-teal-950 via-teal-900 to-cyan-900 text-white">
+          <div class="absolute inset-0 opacity-25" style="background-image: radial-gradient(rgba(255,255,255,0.24) 1px, transparent 1px); background-size: 18px 18px;"></div>
+          <div class="relative">
+            <div class="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs tracking-wide uppercase">
+              <span class="material-symbols-outlined text-base">health_and_safety</span>
+              Prior Authorization Intelligence
+            </div>
+            <h1 class="mt-6 text-4xl md:text-5xl font-headline font-extrabold leading-tight tracking-tight">
+              Time-to-Therapy
+            </h1>
+            <p class="mt-4 text-teal-50/95 text-base md:text-lg leading-relaxed max-w-xl">
+              A clinician-first workspace for payer policy interpretation, cross-payer coverage comparison, and evidence-grounded draft generation.
+            </p>
+
+            <div class="mt-8 grid gap-3 text-sm">
+              <div class="rounded-xl border border-white/20 bg-white/10 px-4 py-3">Coverage Matrix with real payer policy evidence and citations</div>
+              <div class="rounded-xl border border-white/20 bg-white/10 px-4 py-3">Copilot drafting workflow aligned to retrieved policy requirements</div>
+              <div class="rounded-xl border border-white/20 bg-white/10 px-4 py-3">History and export-friendly decision support for care teams</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="px-6 py-8 md:px-9 md:py-10 lg:px-10 lg:py-12">
+          <h2 class="text-2xl md:text-3xl font-headline font-extrabold text-teal-900">Secure Clinician Access</h2>
+          <p class="mt-2 text-sm md:text-base text-slate-600">
+            Sign in to continue to the Coverage Matrix and the full Time-to-Therapy workflow.
+          </p>
+
+          <div id="auth-status" class="mt-5 rounded-xl bg-slate-100 text-slate-700 text-sm px-4 py-3">
+            Initializing authentication...
+          </div>
+
+          <div class="mt-5 grid grid-cols-2 gap-3">
+            <button id="auth-signin-btn" type="button" class="w-full rounded-xl bg-teal-700 text-white font-semibold py-3 transition-colors hover:bg-teal-800">
+              Sign In
+            </button>
+            <button id="auth-signup-btn" type="button" class="w-full rounded-xl border border-teal-700 text-teal-700 font-semibold py-3 transition-colors hover:bg-teal-50">
+              Create Account
+            </button>
+          </div>
+
+          <div class="mt-5">
+            <form id="auth-signin-form" class="space-y-4">
+              <div>
+                <label for="signin-email" class="block text-sm font-semibold text-slate-700">Email</label>
+                <input id="signin-email" name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600" placeholder="clinician@hospital.org" />
+              </div>
+              <div>
+                <label for="signin-password" class="block text-sm font-semibold text-slate-700">Password</label>
+                <input id="signin-password" name="password" type="password" autocomplete="current-password" required minlength="8" class="mt-1 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600" placeholder="Enter your password" />
+              </div>
+              <button type="submit" class="w-full rounded-xl bg-teal-700 text-white font-semibold py-3 hover:bg-teal-800 transition-colors">
+                Sign In to App
+              </button>
+            </form>
+
+            <form id="auth-signup-form" class="hidden space-y-4">
+              <div>
+                <label for="signup-name" class="block text-sm font-semibold text-slate-700">Name</label>
+                <input id="signup-name" name="name" type="text" autocomplete="name" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600" placeholder="Dr. Alex Rivera" />
+              </div>
+              <div>
+                <label for="signup-email" class="block text-sm font-semibold text-slate-700">Email</label>
+                <input id="signup-email" name="email" type="email" autocomplete="email" required class="mt-1 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600" placeholder="clinician@hospital.org" />
+              </div>
+              <div>
+                <label for="signup-password" class="block text-sm font-semibold text-slate-700">Password</label>
+                <input id="signup-password" name="password" type="password" autocomplete="new-password" required minlength="8" class="mt-1 w-full rounded-xl border-slate-300 focus:border-teal-600 focus:ring-teal-600" placeholder="At least 8 characters" />
+              </div>
+              <button type="submit" class="w-full rounded-xl bg-teal-700 text-white font-semibold py-3 hover:bg-teal-800 transition-colors">
+                Create Account
+              </button>
+            </form>
+          </div>
+
+          <p id="auth-form-error" class="hidden mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700"></p>
+
+          <button id="auth-continue-btn" type="button" class="hidden mt-4 w-full rounded-xl border border-slate-300 text-slate-700 font-semibold py-3 hover:bg-slate-50 transition-colors">
+            Continue to App
+          </button>
+
+          <p class="mt-5 text-xs text-slate-500 leading-relaxed">
+            Access is restricted to authenticated users. If not logged in, all app pages redirect to this login entry point.
+          </p>
+        </div>
       </div>
-
-      <p class="text-sm text-slate-600 mb-5">
-        Secure clinician access is required before using the Coverage Matrix, Copilot Drafting, and History workflows.
-      </p>
-
-      <div id="auth-status" class="rounded-lg bg-slate-100 text-slate-700 text-sm px-4 py-3 mb-6">
-        Initializing authentication...
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <button id="auth-signin-btn" type="button" class="w-full rounded-lg bg-teal-700 text-white font-semibold py-3 hover:bg-teal-800 transition-colors">
-          Sign In
-        </button>
-        <button id="auth-signup-btn" type="button" class="w-full rounded-lg border border-teal-700 text-teal-700 font-semibold py-3 hover:bg-teal-50 transition-colors">
-          Create Account
-        </button>
-      </div>
-
-      <button id="auth-continue-btn" type="button" class="hidden mt-4 w-full rounded-lg border border-slate-300 text-slate-700 font-semibold py-3 hover:bg-slate-50 transition-colors">
-        Continue to App
-      </button>
-
-      <p class="text-xs text-slate-500 mt-6">
-        By signing in, clinicians can securely access patient context workflows and payer policy evidence.
-      </p>
     </section>
   </main>
 </body>

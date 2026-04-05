@@ -6,6 +6,13 @@ Run:
 
 from pathlib import Path
 import sys
+import os
+from uuid import uuid4
+
+os.environ["AUTH_ENABLED"] = "true"
+os.environ["AUTH0_DOMAIN"] = ""
+os.environ["AUTH0_CLIENT_ID"] = ""
+os.environ["AUTH0_AUDIENCE"] = ""
 
 from fastapi.testclient import TestClient
 
@@ -24,9 +31,61 @@ def run() -> None:
 
     checks = []
 
-    # Core routes
-    checks.append(("GET /", client.get("/", follow_redirects=False).status_code == 307))
-    checks.append(("GET /login", client.get("/login").status_code == 200))
+    # Core routes before login
+    root = client.get("/", follow_redirects=False)
+    login = client.get("/login", follow_redirects=False)
+    matrix_locked = client.get("/matrix", follow_redirects=False)
+    copilot_locked = client.get("/copilot", follow_redirects=False)
+    history_locked = client.get("/history", follow_redirects=False)
+    static_html_locked = client.get("/static/matrix.html", follow_redirects=False)
+
+    checks.append(("GET / redirects", root.status_code == 307))
+    checks.append(("GET /login", login.status_code == 200))
+    checks.append(("GET /matrix locked before login", matrix_locked.status_code == 307 and matrix_locked.headers.get("location") == "/login"))
+    checks.append(("GET /copilot locked before login", copilot_locked.status_code == 307 and copilot_locked.headers.get("location") == "/login"))
+    checks.append(("GET /history locked before login", history_locked.status_code == 307 and history_locked.headers.get("location") == "/login"))
+    checks.append(("GET /static/matrix.html locked before login", static_html_locked.status_code == 307 and static_html_locked.headers.get("location") == "/login"))
+
+    # Register + login workflow
+    auth_config = client.get("/auth/config")
+    auth_config_json = auth_config.json()
+    checks.append(("GET /auth/config 200", auth_config.status_code == 200))
+    checks.append(("Auth config enabled", bool(auth_config_json.get("enabled"))))
+    checks.append(("Auth provider local", auth_config_json.get("provider") == "local"))
+
+    user_email = f"qa_{uuid4().hex[:12]}@example.com"
+    register = client.post(
+        "/auth/register",
+        json={
+            "name": "QA Clinician",
+            "email": user_email,
+            "password": "SecurePass123",
+        },
+    )
+    checks.append(("POST /auth/register 200", register.status_code == 200))
+
+    me_after_register = client.get("/auth/me")
+    checks.append(("GET /auth/me after register", me_after_register.status_code == 200))
+
+    logout = client.post("/auth/logout")
+    checks.append(("POST /auth/logout 200", logout.status_code == 200))
+
+    matrix_locked_again = client.get("/matrix", follow_redirects=False)
+    checks.append(("GET /matrix locked after logout", matrix_locked_again.status_code == 307 and matrix_locked_again.headers.get("location") == "/login"))
+
+    login_resp = client.post(
+        "/auth/login",
+        json={
+            "email": user_email,
+            "password": "SecurePass123",
+        },
+    )
+    checks.append(("POST /auth/login 200", login_resp.status_code == 200))
+
+    me_after_login = client.get("/auth/me")
+    checks.append(("GET /auth/me after login", me_after_login.status_code == 200))
+
+    # Core routes after login
     checks.append(("GET /auth/callback", client.get("/auth/callback").status_code == 200))
     checks.append(("GET /matrix", client.get("/matrix").status_code == 200))
     checks.append(("GET /copilot", client.get("/copilot").status_code == 200))
@@ -40,9 +99,6 @@ def run() -> None:
     checks.append(("RAG ready", bool(health_json.get("rag_ready"))))
     checks.append(("Indexed chunks > 0", int(health_json.get("indexed_chunks", 0)) > 0))
 
-    auth_config = client.get("/auth/config")
-    auth_config_json = auth_config.json()
-    checks.append(("GET /auth/config 200", auth_config.status_code == 200))
     checks.append(("Auth config returns enabled flag", "enabled" in auth_config_json))
 
     # Matrix API

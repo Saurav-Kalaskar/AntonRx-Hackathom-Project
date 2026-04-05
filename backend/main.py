@@ -2,6 +2,9 @@ import sqlite3
 import json
 import os
 import re
+import base64
+import hashlib
+import hmac
 from pathlib import Path
 from urllib.parse import quote_plus
 import httpx
@@ -28,7 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 try:
     from .generator.drafter import PADrafter
@@ -38,6 +41,7 @@ try:
         get_auth_public_config,
         get_auth_settings,
         has_valid_app_session,
+        get_app_session_user,
         issue_app_session_token,
         set_app_session_cookie,
         clear_app_session_cookie,
@@ -53,6 +57,7 @@ except ImportError as exc:
         get_auth_public_config,
         get_auth_settings,
         has_valid_app_session,
+        get_app_session_user,
         issue_app_session_token,
         set_app_session_cookie,
         clear_app_session_cookie,
@@ -132,6 +137,74 @@ def _ensure_history_schema() -> None:
 
 
 _ensure_history_schema()
+
+
+def _ensure_user_schema() -> None:
+    cursor.execute(
+        """
+        CREATE TABLE IF NOT EXISTS app_users (
+            id            INTEGER PRIMARY KEY AUTOINCREMENT,
+            name          TEXT NOT NULL,
+            email         TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+        """
+    )
+    conn.commit()
+
+
+_ensure_user_schema()
+
+
+def _normalize_email(email: str) -> str:
+    return (email or "").strip().lower()
+
+
+def _hash_password(password: str) -> str:
+    iterations = 240000
+    salt = os.urandom(16)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    salt_b64 = base64.urlsafe_b64encode(salt).decode("ascii")
+    digest_b64 = base64.urlsafe_b64encode(digest).decode("ascii")
+    return f"pbkdf2_sha256${iterations}${salt_b64}${digest_b64}"
+
+
+def _verify_password(password: str, password_hash: str) -> bool:
+    try:
+        algo, iteration_raw, salt_b64, digest_b64 = (password_hash or "").split("$", 3)
+        if algo != "pbkdf2_sha256":
+            return False
+        iterations = int(iteration_raw)
+        salt = base64.urlsafe_b64decode(salt_b64.encode("ascii"))
+        expected = base64.urlsafe_b64decode(digest_b64.encode("ascii"))
+        actual = hashlib.pbkdf2_hmac("sha256", (password or "").encode("utf-8"), salt, iterations)
+        return hmac.compare_digest(actual, expected)
+    except Exception:
+        return False
+
+
+def _issue_local_user_session(user_id: int, name: str, email: str) -> JSONResponse:
+    settings = get_auth_settings()
+    session_user = {
+        "sub": f"local:{user_id}",
+        "name": name,
+        "email": email,
+        "auth_provider": "local",
+    }
+    session_token = issue_app_session_token(session_user, settings)
+    response = JSONResponse(
+        {
+            "status": "ok",
+            "user": {
+                "id": user_id,
+                "name": name,
+                "email": email,
+            },
+        }
+    )
+    set_app_session_cookie(response, session_token)
+    return response
 
 def _sanitize_search_term(term: str) -> str:
     cleaned = re.sub(r"[^A-Za-z0-9\s\-()+/]", "", (term or ""))
@@ -234,6 +307,17 @@ class DraftResponse(BaseModel):
     payer_name: str
 
 
+class SignInRequest(BaseModel):
+    email: str
+    password: str
+
+
+class SignUpRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
 # ── Frontend Page Routes ─────────────────────────────────────────────────────
 
 @app.get("/", include_in_schema=False)
@@ -286,11 +370,93 @@ async def auth_config():
     return get_auth_public_config()
 
 
+@app.get("/auth/me")
+async def auth_me(request: Request):
+    settings = get_auth_settings()
+    if not settings.get("enabled"):
+        return {"authenticated": False, "provider": "none"}
+
+    user = get_app_session_user(request)
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated.")
+
+    return {
+        "authenticated": True,
+        "provider": settings.get("provider"),
+        "user": {
+            "sub": user.get("sub"),
+            "name": user.get("name"),
+            "email": user.get("email"),
+        },
+    }
+
+
+@app.post("/auth/login")
+async def auth_login(payload: SignInRequest):
+    settings = get_auth_settings()
+    if not settings.get("enabled"):
+        raise HTTPException(status_code=400, detail="Authentication is disabled.")
+    if settings.get("provider") != "local":
+        raise HTTPException(status_code=400, detail="Local credential login is not enabled.")
+
+    email = _normalize_email(payload.email)
+    password = payload.password or ""
+    if not email or not password:
+        raise HTTPException(status_code=400, detail="Email and password are required.")
+
+    cursor.execute(
+        "SELECT id, name, email, password_hash FROM app_users WHERE email = ?",
+        (email,),
+    )
+    row = cursor.fetchone()
+    if not row or not _verify_password(password, row[3]):
+        raise HTTPException(status_code=401, detail="Invalid email or password.")
+
+    return _issue_local_user_session(user_id=int(row[0]), name=row[1], email=row[2])
+
+
+@app.post("/auth/register")
+async def auth_register(payload: SignUpRequest):
+    settings = get_auth_settings()
+    if not settings.get("enabled"):
+        raise HTTPException(status_code=400, detail="Authentication is disabled.")
+    if settings.get("provider") != "local":
+        raise HTTPException(status_code=400, detail="Local registration is not enabled.")
+
+    name = " ".join((payload.name or "").split()).strip()
+    email = _normalize_email(payload.email)
+    password = payload.password or ""
+
+    if len(name) < 2:
+        raise HTTPException(status_code=400, detail="Name must be at least 2 characters.")
+    if "@" not in email or "." not in email.split("@")[-1]:
+        raise HTTPException(status_code=400, detail="Please enter a valid email address.")
+    if len(password) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters.")
+
+    cursor.execute("SELECT id FROM app_users WHERE email = ?", (email,))
+    if cursor.fetchone():
+        raise HTTPException(status_code=409, detail="An account with this email already exists.")
+
+    cursor.execute(
+        "INSERT INTO app_users (name, email, password_hash) VALUES (?, ?, ?)",
+        (name, email, _hash_password(password)),
+    )
+    conn.commit()
+    user_id = int(cursor.lastrowid)
+    return _issue_local_user_session(user_id=user_id, name=name, email=email)
+
+
 @app.post("/auth/session")
-async def create_auth_session(_user: Dict[str, Any] | None = Depends(require_auth)):
+async def create_auth_session(request: Request, _user: Optional[Dict[str, Any]] = Depends(require_auth)):
     settings = get_auth_settings()
     if not settings.get("enabled"):
         return {"status": "auth-disabled"}
+
+    if settings.get("provider") != "auth0":
+        if not get_app_session_user(request):
+            raise HTTPException(status_code=401, detail="Missing authenticated user.")
+        return {"status": "ok"}
 
     if not _user:
         raise HTTPException(status_code=401, detail="Missing authenticated user.")
