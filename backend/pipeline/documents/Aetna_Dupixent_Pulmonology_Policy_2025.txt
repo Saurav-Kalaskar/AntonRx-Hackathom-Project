@@ -1,0 +1,34 @@
+Aetna Pulmonology Medical Policy - Dupilumab (Dupixent)
+Effective Date: May 2025 | Policy Number: AET-PULM-2025-DUPIXENT
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Moderate-to-severe eosinophilic asthma uncontrolled on high-dose inhaled corticosteroid plus long-acting beta agonist (ICD-10: J45.50)
+- Oral corticosteroid-dependent asthma requiring steroid-sparing biologic strategy (ICD-10: J45.52)
+- Chronic rhinosinusitis with nasal polyps with inadequate response to intranasal corticosteroids (ICD-10: J33.9)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Provider must submit baseline eosinophil count, exacerbation history, pulmonary function data, and current controller regimen. Documentation of adherence to maintenance inhaler therapy is required.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires optimized inhaled corticosteroid and long-acting bronchodilator therapy for at least twelve weeks unless contraindicated.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Initial dose may be administered in a supervised outpatient setting, with transition to home self-administration when clinically appropriate.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Typical dosing is 300 mg subcutaneously every two weeks for severe asthma, with alternate dosing schedules permitted by labeled indication.

@@ -137,7 +137,7 @@ class RAGEngine:
         return header_payer or "Unknown"
 
     def _extract_drug_name(self, header_line: str) -> str:
-        match = re.search(r"—\s*(.+)$", header_line)
+        match = re.search(r"\s[-—]\s(.+)$", header_line)
         if match:
             return match.group(1).strip()
         return header_line or "Unknown Drug"
@@ -194,14 +194,25 @@ class RAGEngine:
 
     def _infer_category(self, header_line: str) -> str:
         lowered = header_line.lower()
-        if "oncology" in lowered:
-            return "Oncology"
-        if "rheumatology" in lowered:
-            return "Rheumatology"
-        if "dermatology" in lowered:
-            return "Dermatology"
-        if "gastro" in lowered:
-            return "Gastroenterology"
+        keyword_to_category = {
+            "oncology": "Oncology",
+            "rheumatology": "Rheumatology",
+            "dermatology": "Dermatology",
+            "gastro": "Gastroenterology",
+            "endocrinology": "Endocrinology",
+            "cardiology": "Cardiology",
+            "pulmonology": "Pulmonology",
+            "respiratory": "Pulmonology",
+            "neurology": "Neurology",
+            "immunology": "Immunology",
+            "infectious disease": "Infectious Disease",
+            "nephrology": "Nephrology",
+        }
+
+        for keyword, category in keyword_to_category.items():
+            if keyword in lowered:
+                return category
+
         return "Specialty"
 
     def _infer_access_status(self, text: str) -> str:
@@ -359,23 +370,39 @@ class RAGEngine:
         self.qdrant.upsert(collection_name=self.collection_name, points=points)
         self.indexed_chunks = len(points)
 
-    def _query_score(self, query: str, row_text: str, medication: str) -> float:
+    def _query_score(self, query: str, row_text: str, medication: str, status: str) -> float:
         query_tokens = set(self._tokenize(query))
         if not query_tokens:
-            return 0.82
+            status_lower = (status or "").lower()
+            if "non-preferred" in status_lower:
+                base = 0.58
+            elif "step" in status_lower or "block" in status_lower:
+                base = 0.72
+            elif "covered" in status_lower:
+                base = 0.89
+            else:
+                base = 0.76
+
+            variability = (int(hashlib.sha256(row_text.encode("utf-8")).hexdigest()[:4], 16) / 65535.0 - 0.5) * 0.12
+            return round(min(0.99, max(0.45, base + variability)), 4)
 
         row_tokens = set(self._tokenize(row_text))
         overlap = len(query_tokens & row_tokens) / max(1, len(query_tokens))
         med_bonus = 0.15 if set(self._tokenize(medication)) & query_tokens else 0.0
-        return round(min(0.99, max(0.45, 0.45 + overlap * 0.45 + med_bonus)), 4)
+        status_bonus = 0.05 if "covered" in (status or "").lower() else 0.0
+        return round(min(0.99, max(0.45, 0.45 + overlap * 0.45 + med_bonus + status_bonus)), 4)
 
-    def build_matrix(self, query: str = "", payer: str = "") -> List[Dict[str, Any]]:
+    def build_matrix(self, query: str = "", payer: str = "", category: str = "") -> List[Dict[str, Any]]:
         q = (query or "").strip().lower()
         payer_filter = (payer or "").strip().lower()
+        category_filter = (category or "").strip().lower()
         rows: List[Dict[str, Any]] = []
 
         for policy in self.policy_records:
             if payer_filter and payer_filter not in policy["payer"].lower():
+                continue
+
+            if category_filter and category_filter != policy.get("drug_category", "").lower():
                 continue
 
             requirements = self._summarize(
@@ -399,12 +426,13 @@ class RAGEngine:
                 if q and q not in row_text.lower() and not (set(self._tokenize(q)) & set(self._tokenize(row_text))):
                     continue
 
-                score = self._query_score(q, row_text, policy["drug_name"])
+                score = self._query_score(q, row_text, policy["drug_name"], status)
                 rows.append(
                     {
                         "payer": policy["payer"],
                         "medication": policy["drug_name"],
                         "indication": indication,
+                        "category": policy.get("drug_category", "Specialty"),
                         "status": status,
                         "requirements": requirements,
                         "score": score,
@@ -415,6 +443,17 @@ class RAGEngine:
 
         rows.sort(key=lambda item: (item["payer"], item["medication"], -item["score"]))
         return rows
+
+    def list_categories(self) -> List[Dict[str, Any]]:
+        counts: Dict[str, int] = {}
+        for policy in self.policy_records:
+            category = policy.get("drug_category") or "Specialty"
+            counts[category] = counts.get(category, 0) + 1
+
+        return [
+            {"category": category, "count": counts[category]}
+            for category in sorted(counts.keys())
+        ]
 
     def search(
         self,

@@ -1,0 +1,34 @@
+Cigna Cardiology Medical Policy - Apixaban (Eliquis)
+Effective Date: April 2025 | Policy Number: CIG-CARD-2025-ELIQUIS
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Atrial fibrillation stroke and systemic embolism prevention (ICD-10: I48.91)
+- Venous thromboembolism treatment and extended secondary prevention (ICD-10: I82.409)
+- Post-hospitalization VTE prevention in selected high-risk patients
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Prior authorization requires diagnosis notes, baseline CBC, renal function tests, and assessment of concomitant antiplatelet use. Prescriber must document bleeding risk counseling.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Coverage may be non-preferred when no prior trial of one formulary direct oral anticoagulant is documented and no contraindication is provided.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+No site-of-care restriction applies for oral direct anticoagulants dispensed through outpatient channels.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Standard dosing is 5 mg twice daily with lower dosing permitted when patient-specific reduction criteria are met.

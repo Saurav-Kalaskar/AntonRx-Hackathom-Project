@@ -5,6 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>Time-to-Therapy | Copilot</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
@@ -87,25 +88,33 @@
   </head>
 <body class="bg-surface text-on-surface antialiased pb-24">
 <!-- TopAppBar -->
-<header class="bg-[#f7f9fb] dark:bg-slate-950 w-full top-0 sticky z-40 transition-colors">
-<div class="flex items-center justify-between px-6 py-4 w-full">
-<div class="flex items-center gap-3">
-<div class="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
-<img alt="Clinician" class="w-full h-full object-cover" data-alt="Close-up professional portrait of a medical clinician wearing a white coat with a soft focused hospital background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_kLJcVF6GqExkj9EdGuPsDKsklpd1Rwas6rMk0bpdbTxtp8Qi58vEaw2qdke998f03M5hm893M-G9ktA-rthRqUbChL9bWP_WcO-pnJTtGIEl723P_yrqDa0hywU-j3eu1pO3g2YeHR_CFYteAhvr9bPuGRJEc6623HwggMmddovVAUp1jdR4QFplTVoEMRKc2McVujPXXNQHoG5jxSzhBZFeBEq-zLDPjH75h8XlDK4zH4hyfvbh873qPFHpA2DF9TBGRSwH5yXA"/>
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-teal-700 dark:text-teal-400" data-icon="clinical_notes">clinical_notes</span>
 </div>
-<h1 class="font-manrope font-bold text-2xl tracking-tight text-teal-900 dark:text-teal-100">Time-to-Therapy</h1>
+<nav class="hidden md:flex ml-auto items-center gap-8 font-headline text-sm font-semibold tracking-tight">
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors" href="/matrix">Matrix</a>
+<a class="text-teal-700 dark:text-teal-400 border-b-2 border-teal-600 pb-1" href="/copilot">Copilot</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors" href="/history">History</a>
+</nav>
+<button id="mobile-menu-button" type="button" aria-label="Open navigation menu" class="md:hidden text-teal-700 dark:text-teal-300 p-2 rounded-lg hover:bg-teal-50 dark:hover:bg-slate-800 transition-colors">
+<span id="mobile-menu-icon" class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
 </div>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-slate-500 hover:bg-slate-200/50 p-2 rounded-full transition-colors cursor-pointer" data-icon="settings">settings</span>
-</div>
-</div>
-<!-- Sub-nav for Matrix/Copilot -->
-<div class="flex px-6 border-b border-outline-variant/15 gap-8">
-<a href="/matrix" class="pb-3 text-sm font-semibold text-slate-400 hover:text-teal-700 transition-colors">Matrix</a>
-<a href="/copilot" class="pb-3 text-sm font-bold text-teal-800 border-b-2 border-teal-800">Copilot</a>
-</div>
+<div class="bg-slate-200/50 dark:bg-slate-800/50 h-[1px]"></div>
 </header>
-<main class="px-4 py-6 space-y-6">
+<div id="mobile-nav-menu" class="hidden md:hidden fixed top-16 inset-x-0 z-40 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+<nav class="px-6 py-3 flex flex-col gap-2 font-headline text-sm font-semibold tracking-tight">
+<a class="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2" href="/matrix">Matrix</a>
+<a class="text-teal-700 dark:text-teal-400 bg-teal-50/70 dark:bg-teal-900/30 rounded-lg px-3 py-2" href="/copilot">Copilot</a>
+<a class="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2" href="/history">History</a>
+</nav>
+</div>
+<main class="pt-24 px-4 py-6 space-y-6">
+<section>
+<h2 class="text-4xl font-headline font-extrabold tracking-tight text-teal-900"><a href="/matrix" class="hover:opacity-90 transition-opacity">Time-to-Therapy</a></h2>
+</section>
 <!-- Context Section: Patient & Policy Context -->
 <section class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(25,28,30,0.04)] p-5 border border-outline-variant/10">
 <div class="flex justify-between items-start mb-4">
@@ -115,19 +124,19 @@
 <div class="grid grid-cols-2 gap-4 mb-5" id="context-form">
 <div>
 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Patient Name</label>
-<input type="text" id="patient-name-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" value="Jane Doe">
+<input type="text" id="patient-name-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" placeholder="Enter patient name" value="">
 </div>
 <div>
 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Diagnosis / Indication</label>
-<input type="text" id="diagnosis-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" value="Non-Small Cell Lung Cancer (C34.9)">
+<input type="text" id="diagnosis-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" placeholder="Enter diagnosis or indication" value="">
 </div>
 <div>
 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Target Payer</label>
-<input type="text" id="payer-input" class="w-full text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-100 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/40 transition-shadow" value="Aetna">
+<input type="text" id="payer-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" placeholder="Enter payer (e.g. Aetna)" value="">
 </div>
 <div>
 <label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Target Drug / Medication</label>
-<input type="text" id="drug-input" class="w-full text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-100 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/40 transition-shadow" value="Keytruda">
+<input type="text" id="drug-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" placeholder="Enter medication name" value="">
 </div>
 </div>
 <div class="space-y-2">
@@ -150,10 +159,6 @@
 </div>
 <!-- Conversational UI -->
 <section class="space-y-4">
-<div class="flex items-center gap-2 mb-2">
-<span class="material-symbols-outlined text-teal-600" data-icon="psychiatry">psychiatry</span>
-<h2 class="font-headline font-bold text-teal-900">Nemotron-3-Super-120B</h2>
-</div>
 <div id="chat-container" class="space-y-4 max-h-[400px] overflow-y-auto pr-1">
 <!-- Welcome Message -->
 <div class="flex justify-start">
@@ -187,7 +192,7 @@ Hello Clinician! I am the Time-to-Therapy AI. Update the patient context above a
 </section>
 <!-- Action Bar -->
 <div class="flex gap-3">
-<button class="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 duration-150">
+<button id="export-draft-btn" type="button" class="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 duration-150">
 <span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
                 Export PDF/CSV
             </button>
@@ -197,7 +202,7 @@ Hello Clinician! I am the Time-to-Therapy AI. Update the patient context above a
 </div>
 </main>
 <!-- BottomNavBar -->
-<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-50 border-t border-[#bcc9c8]/15 shadow-[0_-4px_20px_rgba(25,28,30,0.04)]">
+<nav id="mobile-bottom-nav" class="hidden fixed bottom-0 left-0 w-full justify-around items-center px-4 py-3 pb-safe bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-50 border-t border-[#bcc9c8]/15 shadow-[0_-4px_20px_rgba(25,28,30,0.04)]">
 <!-- Matrix -->
 <a href="/matrix" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-teal-600 transition-colors">
 <span class="material-symbols-outlined mb-1" data-icon="grid_view">grid_view</span>
@@ -231,6 +236,157 @@ Hello Clinician! I am the Time-to-Therapy AI. Update the patient context above a
         const drugInput = document.getElementById('drug-input');
         const warningTitle = document.getElementById('warning-title');
         const warningText = document.getElementById('warning-text');
+        const exportDraftButton = document.getElementById('export-draft-btn');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+        const mobileNavMenu = document.getElementById('mobile-nav-menu');
+
+        if (mobileMenuButton && mobileNavMenu && mobileMenuIcon) {
+            const closeMobileMenu = () => {
+                mobileNavMenu.classList.add('hidden');
+                mobileMenuIcon.textContent = 'menu';
+            };
+
+            mobileMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isHidden = mobileNavMenu.classList.toggle('hidden');
+                mobileMenuIcon.textContent = isHidden ? 'menu' : 'close';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (mobileNavMenu.classList.contains('hidden')) return;
+                if (mobileNavMenu.contains(event.target) || mobileMenuButton.contains(event.target)) return;
+                closeMobileMenu();
+            });
+
+            mobileNavMenu.querySelectorAll('a').forEach((anchor) => {
+                anchor.addEventListener('click', closeMobileMenu);
+            });
+        }
+
+        function safeFilenamePart(value = '') {
+            return (value || 'unknown').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'unknown';
+        }
+
+        async function saveBlobToFile(blob, filename, mimeTypeDescription = 'File') {
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: mimeTypeDescription,
+                            accept: { [blob.type || 'application/octet-stream']: [`.${filename.split('.').pop()}`] },
+                        }],
+                    });
+
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    return;
+                } catch (err) {
+                    if (err && err.name === 'AbortError') {
+                        return;
+                    }
+                    console.warn('showSaveFilePicker failed, falling back to anchor download.', err);
+                }
+            }
+
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = filename;
+            anchor.rel = 'noopener';
+            document.body.appendChild(anchor);
+            anchor.click();
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+                anchor.remove();
+            }, 1500);
+        }
+
+        function getDraftExportContext() {
+            const draftEl = document.getElementById('exportable-draft');
+            if (!draftEl || !draftEl.innerText.trim()) {
+                return null;
+            }
+
+            const dateValue = new Date().toISOString().slice(0, 10);
+            const patient = patientNameInput.value || 'Patient';
+            const payer = payerInput.value || 'Payer';
+
+            return {
+                content: draftEl.innerText.trim(),
+                patient,
+                payer,
+                diagnosis: diagnosisInput.value || '',
+                medication: drugInput.value || '',
+                baseFilename: `pa_letter_${safeFilenamePart(patient)}_${safeFilenamePart(payer)}_${dateValue}`,
+                generatedOn: new Date().toISOString(),
+            };
+        }
+
+        async function exportDraftAsPdf(ctx) {
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('PDF library failed to load. Please refresh and try again.');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 40;
+            const contentWidth = pageWidth - margin * 2;
+            let y = margin;
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text('Prior Authorization Draft Letter', margin, y);
+            y += 24;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text(`Patient: ${ctx.patient}`, margin, y);
+            y += 14;
+            doc.text(`Payer: ${ctx.payer}`, margin, y);
+            y += 14;
+            doc.text(`Diagnosis: ${ctx.diagnosis}`, margin, y);
+            y += 14;
+            doc.text(`Medication: ${ctx.medication}`, margin, y);
+            y += 20;
+
+            doc.setFontSize(11);
+            const wrapped = doc.splitTextToSize(ctx.content, contentWidth);
+
+            wrapped.forEach((line) => {
+                if (y > pageHeight - margin) {
+                    doc.addPage();
+                    y = margin;
+                }
+                doc.text(line, margin, y);
+                y += 14;
+            });
+
+            const blob = doc.output('blob');
+            await saveBlobToFile(blob, `${ctx.baseFilename}.pdf`, 'PDF Document');
+        }
+
+        async function exportDraftAsCsv(ctx) {
+            const escapeCsv = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+            const rows = [
+                ['Field', 'Value'],
+                ['Patient', ctx.patient],
+                ['Payer', ctx.payer],
+                ['Diagnosis', ctx.diagnosis],
+                ['Medication', ctx.medication],
+                ['GeneratedOn', ctx.generatedOn],
+                ['DraftText', ctx.content.replace(/\r?\n/g, ' ')],
+            ];
+
+            const csv = rows.map((row) => row.map(escapeCsv).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+            await saveBlobToFile(blob, `${ctx.baseFilename}.csv`, 'CSV Document');
+        }
 
         const queryParams = new URLSearchParams(window.location.search);
         if (queryParams.get('payer')) payerInput.value = queryParams.get('payer');
@@ -263,17 +419,31 @@ Hello Clinician! I am the Time-to-Therapy AI. Update the patient context above a
             sendButton.disabled = true;
             
             const thinkingId = 'ai-thinking-' + Date.now();
-            appendAIMessage(`<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-primary animate-ping-slow"></div><span>Querying RAG vectors &amp; drafting PA letter with Nemotron-120B...</span></div>`, thinkingId);
+            appendAIMessage(`<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-primary animate-ping-slow"></div><span>Querying policy evidence and drafting your PA letter...</span></div>`, thinkingId);
             
-            draftResultArea.innerHTML = '<p class="italic text-slate-400 animate-pulse">Generating draft using Nvidia Nemotron-3-Super-120B... This may take 15-30 seconds.</p>';
+            draftResultArea.innerHTML = '<p class="italic text-slate-400 animate-pulse">Generating draft from retrieved payer policy evidence... This may take 15-30 seconds.</p>';
+
+            const patientName = patientNameInput.value.trim();
+            const diagnosis = diagnosisInput.value.trim();
+            const payerName = payerInput.value.trim();
+            const medication = drugInput.value.trim();
+
+            if (!patientName || !diagnosis || !payerName || !medication) {
+                const thinkingEl = document.getElementById(thinkingId);
+                if (thinkingEl) thinkingEl.remove();
+                sendButton.disabled = false;
+                appendAIMessage('Please complete all Patient & Policy Context fields before generating a draft.');
+                draftResultArea.innerHTML = '<p class="text-amber-700 font-semibold text-sm">Please enter patient name, diagnosis, payer, and medication to continue.</p>';
+                return;
+            }
 
             try {
                 const requestPayload = {
-                    payer_name: payerInput.value.trim() || "Aetna",
+                    payer_name: payerName,
                     patient_context: {
-                        patient_name: patientNameInput.value.trim() || "Jane Doe",
-                        diagnosis: diagnosisInput.value.trim() || "Non-Small Cell Lung Cancer (C34.9)",
-                        medication: drugInput.value.trim() || "Keytruda"
+                        patient_name: patientName,
+                        diagnosis: diagnosis,
+                        medication: medication
                     }
                 };
 
@@ -341,23 +511,30 @@ Hello Clinician! I am the Time-to-Therapy AI. Update the patient context above a
             if (e.key === 'Enter') sendButton.click();
         });
 
-        // Export to plain text (opens in new tab for user to print/save)
-        document.querySelector('[data-icon="picture_as_pdf"]')?.closest('button')?.addEventListener('click', () => {
-            const draftEl = document.getElementById('exportable-draft');
-            if (!draftEl || draftEl.children.length === 0) {
+        exportDraftButton?.addEventListener('click', async () => {
+            const ctx = getDraftExportContext();
+            if (!ctx) {
                 alert('Generate a PA draft first before exporting.');
                 return;
             }
-            const content = draftEl.innerText;
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            const patient = document.getElementById('patient-name-input').value || 'Patient';
-            const payer = document.getElementById('payer-input').value || 'Payer';
-            a.download = `PA_Letter_${patient.replace(/\s+/g,'_')}_${payer}_${new Date().toISOString().split('T')[0]}.txt`;
-            a.click();
-            URL.revokeObjectURL(url);
+
+            const formatInput = window.prompt('Export format: enter PDF or CSV', 'PDF');
+            if (!formatInput) {
+                return;
+            }
+
+            const format = formatInput.trim().toLowerCase();
+            if (format === 'pdf') {
+                await exportDraftAsPdf(ctx);
+                return;
+            }
+
+            if (format === 'csv') {
+                await exportDraftAsCsv(ctx);
+                return;
+            }
+
+            alert('Unsupported format. Please enter PDF or CSV.');
         });
     </script>
 </body></html>

@@ -1,0 +1,33 @@
+Aetna Infectious Disease Medical Policy - Bictegravir Emtricitabine Tenofovir (Biktarvy)
+Effective Date: August 2025 | Policy Number: AET-INF-2025-BIKTARVY
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Human immunodeficiency virus type 1 treatment in treatment-naive adults and adolescents (ICD-10: B20)
+- Regimen switch in virologically suppressed adults without resistance to regimen components (ICD-10: B20)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Coverage requires HIV diagnosis confirmation, baseline viral load, CD4 count, resistance history review, and hepatitis B status.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires use of guideline-aligned first-line antiretroviral options unless resistance profile or adherence considerations justify direct use.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Oral antiretroviral therapy is covered through outpatient specialty pharmacy with adherence support program enrollment.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Dose is one tablet orally once daily with renal and hepatic monitoring based on clinical status.

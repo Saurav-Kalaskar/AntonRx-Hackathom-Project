@@ -1,0 +1,34 @@
+Cigna Immunology Medical Policy - Secukinumab (Cosentyx)
+Effective Date: July 2025 | Policy Number: CIG-IMM-2025-COSENTYX
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Plaque psoriasis requiring biologic intervention after inadequate response to topical and phototherapy pathways (ICD-10: L40.0)
+- Psoriatic arthritis with persistent active synovitis (ICD-10: L40.50)
+- Ankylosing spondylitis with objective inflammation on imaging or labs (ICD-10: M45.9)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Coverage requires specialist notes, severity metrics, prior systemic treatment record, and latent TB evaluation prior to biologic initiation.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Coverage may be non-preferred when no trial of formulary biologic alternatives or documented contraindication exists.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Medication may be initiated in clinic and maintained through supervised home self-administration with routine follow-up.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Standard maintenance schedule is 300 mg every four weeks following loading doses per labeled protocol.

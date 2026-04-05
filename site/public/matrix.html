@@ -5,6 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Time-to-Therapy | Coverage Matrix</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <style>
@@ -111,20 +112,27 @@
 <div class="flex justify-between items-center px-6 h-16 w-full">
 <div class="flex items-center gap-2">
 <span class="material-symbols-outlined text-teal-700 dark:text-teal-400" data-icon="clinical_notes">clinical_notes</span>
-<h1 class="text-xl font-bold tracking-tight text-teal-800 dark:text-teal-300 font-headline">Time-to-Therapy</h1>
+<h1 class="text-xl font-bold tracking-tight text-teal-800 dark:text-teal-300 font-headline"><a href="/matrix" class="hover:opacity-90 transition-opacity">Time-to-Therapy</a></h1>
 </div>
 <!-- Web Nav Cluster (Hidden on Mobile) -->
-<nav class="hidden md:flex items-center gap-8 font-headline text-sm font-semibold tracking-tight">
+<nav class="hidden md:flex ml-auto items-center gap-8 font-headline text-sm font-semibold tracking-tight">
 <a class="text-teal-700 dark:text-teal-400 border-b-2 border-teal-600 pb-1" href="/matrix">Matrix</a>
 <a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors" href="/copilot">Copilot</a>
 <a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors" href="/history">History</a>
 </nav>
-<div class="flex items-center gap-4">
-<span class="material-symbols-outlined text-teal-700 dark:text-teal-400" data-icon="search">search</span>
-</div>
+<button id="mobile-menu-button" type="button" aria-label="Open navigation menu" class="md:hidden text-teal-700 dark:text-teal-300 p-2 rounded-lg hover:bg-teal-50 dark:hover:bg-slate-800 transition-colors">
+<span id="mobile-menu-icon" class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
 </div>
 <div class="bg-slate-200/50 dark:bg-slate-800/50 h-[1px]"></div>
 </header>
+<div id="mobile-nav-menu" class="hidden md:hidden fixed top-16 inset-x-0 z-40 bg-slate-50/95 dark:bg-slate-950/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800">
+<nav class="px-6 py-3 flex flex-col gap-2 font-headline text-sm font-semibold tracking-tight">
+<a class="text-teal-700 dark:text-teal-400 bg-teal-50/70 dark:bg-teal-900/30 rounded-lg px-3 py-2" href="/matrix">Matrix</a>
+<a class="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2" href="/copilot">Copilot</a>
+<a class="text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg px-3 py-2" href="/history">History</a>
+</nav>
+</div>
 <main class="pt-20 pb-24 px-4 md:px-8 max-w-7xl mx-auto space-y-6">
 <!-- Search Hero Section -->
 <section class="mt-4">
@@ -134,6 +142,11 @@
 <div class="relative group">
 <span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-primary/60" data-icon="search">search</span>
 <input id="matrix-search" class="w-full bg-white/10 border-white/20 rounded-lg pl-12 pr-4 py-3 text-on-primary placeholder-on-primary/50 focus:ring-2 focus:ring-primary-fixed/40 focus:border-transparent outline-none backdrop-blur-sm transition-all font-body" placeholder="Search drug (e.g. Keytruda, Opdivo)" type="text"/>
+</div>
+<div id="drug-info-result" class="hidden mt-3 rounded-lg border border-white/25 bg-white/10 p-3">
+<p class="text-[11px] uppercase tracking-wider font-bold text-on-primary/85">Drug Information</p>
+<a id="drug-info-link" class="text-sm font-semibold text-white underline underline-offset-2 break-all" href="#" target="_blank" rel="noopener noreferrer"></a>
+<p id="drug-info-source" class="text-[11px] text-on-primary/80 mt-1"></p>
 </div>
 </div>
 <!-- Abstract decorative element -->
@@ -146,16 +159,16 @@
 <div>
 <span class="text-label-md font-semibold text-secondary uppercase tracking-widest text-[10px]">Real-time Live API Data</span>
 <h3 class="text-2xl font-headline font-bold text-on-surface mt-1">Coverage Matrix Directory</h3>
-<p class="text-sm text-on-surface-variant mt-2 max-w-md">Real-time coverage comparison across payers, dynamically loading from the local backend.</p>
+<p id="insight-summary" class="text-sm text-on-surface-variant mt-2 max-w-md">Real-time coverage comparison across payers, dynamically loading from the local backend.</p>
 </div>
 <div class="mt-6 flex gap-3">
 <div class="bg-primary-container/10 px-3 py-1.5 rounded-full flex items-center gap-2">
 <span class="material-symbols-outlined text-[16px] text-primary" data-icon="verified">verified</span>
-<span class="text-xs font-semibold text-primary">High Accuracy</span>
+<span id="insight-accuracy" class="text-xs font-semibold text-primary">High Accuracy</span>
 </div>
 <div class="bg-tertiary-container/10 px-3 py-1.5 rounded-full flex items-center gap-2">
 <span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="warning">warning</span>
-<span class="text-xs font-semibold text-tertiary">2 Blockers Detected</span>
+<span id="insight-blockers" class="text-xs font-semibold text-tertiary">0 Blockers Detected</span>
 </div>
 </div>
 </div>
@@ -163,19 +176,44 @@
 <div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mb-3">
 <span class="material-symbols-outlined text-primary text-3xl" data-icon="speed">speed</span>
 </div>
-<span class="text-xs font-bold text-secondary uppercase tracking-tight">Avg. Time-to-Therapy</span>
-<span class="text-3xl font-headline font-extrabold text-primary">14.2 Days</span>
+<span id="avg-therapy-label" class="text-xs font-bold text-secondary uppercase tracking-tight">Avg. Time-to-Therapy (Estimated)</span>
+<span id="avg-therapy-days" class="text-3xl font-headline font-extrabold text-primary">-- Days</span>
 </div>
 </div>
-<!-- Coverage Matrix Table -->
+<!-- Cross-Payer Comparison Snapshot -->
 <section class="space-y-4">
 <div class="flex justify-between items-end px-1">
-<h3 class="text-lg font-headline font-bold">Cross-Payer Matrix</h3>
+<h3 class="text-lg font-headline font-bold">Cross-Payer Comparison Snapshot</h3>
+<p class="text-[11px] text-on-surface-variant">At-a-glance payer comparison without scrolling through long criteria text.</p>
+</div>
+<div class="overflow-x-auto rounded-lg border border-outline-variant/15 shadow-sm bg-surface-container-lowest">
+<table class="w-full border-collapse text-left" id="compare-table">
+<thead id="compare-thead" class="bg-surface-container-low">
+<tr>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Medication</th>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Primary Indication</th>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Payer Comparison</th>
+</tr>
+</thead>
+<tbody id="compare-tbody" class="text-sm">
+<tr><td colspan="3" class="px-4 py-4 text-center text-slate-400 italic">Loading cross-payer snapshot...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Coverage Matrix Table -->
+<section id="detailed-policy-section" class="space-y-4">
+<div class="flex justify-between items-end px-1">
+<h3 class="text-lg font-headline font-bold">Detailed Policy Rows</h3>
 <div class="flex gap-2">
-<button class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-secondary px-3 py-1 rounded-full bg-surface-container border border-outline-variant/20">
-<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span> Filter
-                    </button>
-<button class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+<label for="category-filter" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-secondary px-3 py-1 rounded-full bg-surface-container border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span>
+<span>Category</span>
+<select id="category-filter" class="border-0 bg-transparent text-[10px] font-bold uppercase tracking-wider text-secondary focus:ring-0 p-0 pr-4">
+<option value="">All</option>
+</select>
+</label>
+<button id="export-btn" type="button" class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/5 border border-primary/10 hover:bg-primary/10 transition-colors">
 <span class="material-symbols-outlined text-sm" data-icon="download">download</span> Export
                     </button>
 </div>
@@ -200,6 +238,7 @@
 <p class="text-[10px] text-on-surface-variant px-1 italic">
                 * Data sourced from real-time payer portals and recent oncology medical policies as of October 2023. Click on markers for full policy text.
             </p>
+<div id="detailed-policy-end" class="h-px"></div>
 </section>
 <!-- Therapy Timeline Component -->
 <section class="space-y-4">
@@ -228,7 +267,7 @@
 </section>
 </main>
 <!-- BottomNavBar -->
-<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-t-2xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] md:hidden">
+<nav id="mobile-bottom-nav" class="hidden fixed bottom-0 left-0 w-full z-50 justify-around items-center px-4 py-3 pb-safe bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-t-2xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] md:hidden">
 <a class="flex flex-col items-center justify-center bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl px-3 py-1 active:scale-95 transition-transform" href="/matrix">
 <span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
 <span class="font-manrope text-[10px] font-medium">Matrix</span>
@@ -246,25 +285,358 @@
 <a href="/copilot" class="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-full shadow-xl flex items-center justify-center text-on-primary md:bottom-8 z-40 active:scale-90 transition-transform">
 <span class="material-symbols-outlined text-2xl" data-icon="smart_toy" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
 </a>
+<button id="scroll-detailed-bottom-btn" type="button" aria-label="Scroll to bottom of detailed policy rows" class="hidden fixed bottom-24 right-24 md:bottom-8 md:right-24 w-12 h-12 rounded-full bg-teal-700 text-white shadow-lg hover:bg-teal-800 transition-colors z-40">
+<span class="material-symbols-outlined text-2xl" data-icon="keyboard_double_arrow_down">keyboard_double_arrow_down</span>
+</button>
 
 <script>
     document.addEventListener('DOMContentLoaded', async () => {
         const tbody = document.getElementById('matrix-tbody');
         const searchInput = document.getElementById('matrix-search');
+        const drugInfoCard = document.getElementById('drug-info-result');
+        const drugInfoLink = document.getElementById('drug-info-link');
+        const drugInfoSource = document.getElementById('drug-info-source');
+        const insightAccuracy = document.getElementById('insight-accuracy');
+        const insightBlockers = document.getElementById('insight-blockers');
+        const insightSummary = document.getElementById('insight-summary');
+        const avgTherapyDays = document.getElementById('avg-therapy-days');
+        const compareThead = document.getElementById('compare-thead');
+        const compareTbody = document.getElementById('compare-tbody');
+        const categoryFilter = document.getElementById('category-filter');
+        const exportButton = document.getElementById('export-btn');
+        const scrollDetailedBottomBtn = document.getElementById('scroll-detailed-bottom-btn');
+        const detailedPolicyEnd = document.getElementById('detailed-policy-end');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenuIcon = document.getElementById('mobile-menu-icon');
+        const mobileNavMenu = document.getElementById('mobile-nav-menu');
         let searchDebounceTimer;
+        let currentMatrixItems = [];
 
-        async function loadMatrix(query = '') {
+        function updateScrollToBottomVisibility() {
+            if (!scrollDetailedBottomBtn || !detailedPolicyEnd) return;
+
+            const hasScrolled = window.scrollY > 30;
+            const isAlreadyNearBottom = detailedPolicyEnd.getBoundingClientRect().top <= (window.innerHeight - 64);
+            const shouldShow = hasScrolled && !isAlreadyNearBottom;
+
+            scrollDetailedBottomBtn.classList.toggle('hidden', !shouldShow);
+        }
+
+        if (scrollDetailedBottomBtn && detailedPolicyEnd) {
+            scrollDetailedBottomBtn.addEventListener('click', () => {
+                detailedPolicyEnd.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            });
+
+            window.addEventListener('scroll', updateScrollToBottomVisibility, { passive: true });
+            window.addEventListener('resize', updateScrollToBottomVisibility);
+            updateScrollToBottomVisibility();
+        }
+
+        if (mobileMenuButton && mobileNavMenu && mobileMenuIcon) {
+            const closeMobileMenu = () => {
+                mobileNavMenu.classList.add('hidden');
+                mobileMenuIcon.textContent = 'menu';
+            };
+
+            mobileMenuButton.addEventListener('click', (event) => {
+                event.stopPropagation();
+                const isHidden = mobileNavMenu.classList.toggle('hidden');
+                mobileMenuIcon.textContent = isHidden ? 'menu' : 'close';
+            });
+
+            document.addEventListener('click', (event) => {
+                if (mobileNavMenu.classList.contains('hidden')) return;
+                if (mobileNavMenu.contains(event.target) || mobileMenuButton.contains(event.target)) return;
+                closeMobileMenu();
+            });
+
+            mobileNavMenu.querySelectorAll('a').forEach((anchor) => {
+                anchor.addEventListener('click', closeMobileMenu);
+            });
+        }
+
+        function safeFilenamePart(value = '') {
+            return (value || 'all').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'all';
+        }
+
+        async function saveBlobToFile(blob, filename, mimeTypeDescription = 'File') {
+            if (window.showSaveFilePicker) {
+                try {
+                    const handle = await window.showSaveFilePicker({
+                        suggestedName: filename,
+                        types: [{
+                            description: mimeTypeDescription,
+                            accept: { [blob.type || 'application/octet-stream']: [`.${filename.split('.').pop()}`] },
+                        }],
+                    });
+
+                    const writable = await handle.createWritable();
+                    await writable.write(blob);
+                    await writable.close();
+                    return;
+                } catch (err) {
+                    if (err && err.name === 'AbortError') {
+                        return;
+                    }
+                    console.warn('showSaveFilePicker failed, falling back to anchor download.', err);
+                }
+            }
+
+            const url = URL.createObjectURL(blob);
+            const anchor = document.createElement('a');
+            anchor.href = url;
+            anchor.download = filename;
+            anchor.rel = 'noopener';
+            document.body.appendChild(anchor);
+            anchor.click();
+
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+                anchor.remove();
+            }, 1500);
+        }
+
+        async function exportFilteredRowsToExcel() {
+            if (!currentMatrixItems.length) {
+                alert('No filtered rows available to export.');
+                return;
+            }
+
+            if (typeof XLSX === 'undefined') {
+                alert('Excel export library failed to load. Please refresh and try again.');
+                return;
+            }
+
+            const mappedRows = currentMatrixItems.map((item) => ({
+                Payer: item.payer || '',
+                Medication: item.medication || '',
+                Category: item.category || '',
+                Indication: item.indication || '',
+                CoverageStatus: item.status || '',
+                MatchScorePercent: Math.round((Number(item.score) || 0) * 100),
+                Requirements: item.requirements || '',
+                Source: item.source || '',
+                SourceURL: item.source_url || '',
+            }));
+
+            const worksheet = XLSX.utils.json_to_sheet(mappedRows);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'FilteredMatrix');
+
+            const queryValue = safeFilenamePart(searchInput?.value?.trim() || 'all-drugs');
+            const categoryValue = safeFilenamePart(categoryFilter?.value || 'all-categories');
+            const dateValue = new Date().toISOString().slice(0, 10);
+            const filename = `matrix-export-${queryValue}-${categoryValue}-${dateValue}.xlsx`;
+
+            const workbookArray = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const blob = new Blob([workbookArray], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            });
+
+            await saveBlobToFile(blob, filename, 'Excel Workbook');
+        }
+
+        function statusBadge(status = 'Unknown') {
+            const lowered = status.toLowerCase();
+            let cls = 'bg-secondary-container/50 text-secondary';
+            let icon = 'schedule';
+
+            if (lowered.includes('non-preferred')) {
+                cls = 'bg-red-50 text-red-700 border border-red-200';
+                icon = 'block';
+            } else if (lowered.includes('step') || lowered.includes('block')) {
+                cls = 'bg-amber-50 text-amber-800 border border-amber-200';
+                icon = 'warning';
+            } else if (lowered.includes('covered')) {
+                cls = 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+                icon = 'check_circle';
+            }
+
+            return `<span class="inline-flex items-center gap-1 px-2 py-1 rounded-full ${cls} text-[11px] font-semibold"><span class="material-symbols-outlined text-[12px]">${icon}</span>${status}</span>`;
+        }
+
+        function renderComparisonTable(payers = [], comparison = []) {
+            if (!compareThead || !compareTbody) return;
+
+            const payerHeaders = payers.map((payer) => `<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">${payer}</th>`).join('');
+            compareThead.innerHTML = `
+                <tr>
+                    <th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Medication</th>
+                    <th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Primary Indication</th>
+                    ${payerHeaders}
+                </tr>
+            `;
+
+            if (!comparison.length) {
+                const colSpan = Math.max(3, 2 + payers.length);
+                compareTbody.innerHTML = `<tr><td colspan="${colSpan}" class="px-4 py-4 text-center text-slate-400">No cross-payer comparison rows found for this search.</td></tr>`;
+                return;
+            }
+
+            compareTbody.innerHTML = '';
+            comparison.forEach((row) => {
+                const payerCells = payers.map((payer) => {
+                    const entry = row.by_payer?.[payer];
+                    if (!entry) {
+                        return '<td class="px-4 py-4 border-b border-outline-variant/5 text-xs text-slate-400">No policy</td>';
+                    }
+
+                    const score = Math.round((entry.score || 0) * 100);
+                    return `
+                        <td class="px-4 py-4 border-b border-outline-variant/5 align-top min-w-[180px]">
+                            ${statusBadge(entry.status || 'Unknown')}
+                            <div class="mt-1 text-[11px] text-on-surface-variant">Confidence: ${score}%</div>
+                            ${entry.source_url ? `<a href="${entry.source_url}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-primary hover:underline">${entry.source || 'Open source'}</a>` : ''}
+                        </td>
+                    `;
+                }).join('');
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-surface-container-low transition-colors';
+                tr.innerHTML = `
+                    <td class="px-4 py-4 border-b border-outline-variant/5 align-top">
+                        <div class="font-semibold text-on-surface text-sm">${row.medication || '-'}</div>
+                        <div class="text-[11px] text-on-surface-variant mt-1">Blockers: ${row.blocker_count || 0}</div>
+                    </td>
+                    <td class="px-4 py-4 border-b border-outline-variant/5 align-top text-xs text-on-surface-variant max-w-xs">${row.indication || '-'}</td>
+                    ${payerCells}
+                `;
+                compareTbody.appendChild(tr);
+            });
+        }
+
+        function buildEndpoint(basePath, query = '', category = '') {
+            const params = new URLSearchParams();
+            if (query) params.set('query', query);
+            if (category) params.set('category', category);
+            const queryString = params.toString();
+            return queryString ? `${basePath}?${queryString}` : basePath;
+        }
+
+        async function loadCategories() {
+            if (!categoryFilter) return;
             try {
-                const endpoint = query ? `/api/matrix?query=${encodeURIComponent(query)}` : '/api/matrix';
+                const response = await fetch('/api/matrix/categories');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const data = await response.json();
+                const categories = Array.isArray(data.categories) ? data.categories : [];
+
+                categoryFilter.innerHTML = '<option value="">All</option>';
+                categories.forEach((entry) => {
+                    const category = entry.category || 'Uncategorized';
+                    const count = Number(entry.count || 0);
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = `${category} (${count})`;
+                    categoryFilter.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Failed to fetch matrix categories', error);
+            }
+        }
+
+        async function loadComparison(query = '', category = '') {
+            try {
+                const endpoint = buildEndpoint('/api/matrix/compare', query, category);
+                const resp = await fetch(endpoint);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+                renderComparisonTable(data.payers || [], data.comparison || []);
+            } catch (error) {
+                console.error('Failed to fetch cross-payer comparison', error);
+                if (compareTbody) {
+                    compareTbody.innerHTML = `<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">Unable to load cross-payer comparison: ${error.message}</td></tr>`;
+                }
+            }
+        }
+
+        function updateInsights(items = []) {
+            if (!items.length) {
+                if (insightAccuracy) insightAccuracy.textContent = 'No Data';
+                if (insightBlockers) insightBlockers.textContent = '0 Blockers Detected';
+                if (insightSummary) insightSummary.textContent = 'No policy rows available for the current search from backend index.';
+                if (avgTherapyDays) avgTherapyDays.textContent = '-- Days';
+                return;
+            }
+
+            const uniquePayers = new Set(items.map((item) => item.payer).filter(Boolean));
+            const avgScore = items.reduce((sum, item) => sum + (Number(item.score) || 0), 0) / items.length;
+            const accuracyPct = Math.round(avgScore * 100);
+            const blockers = items.filter((item) => {
+                const status = (item.status || '').toLowerCase();
+                return status.includes('step') || status.includes('non-preferred') || status.includes('block');
+            }).length;
+
+            // Data-driven estimate so this card reflects backend results instead of static text.
+            const estimatedDays = Math.max(4, Math.min(30, 7 + blockers * 1.8 + (1 - avgScore) * 8));
+
+            if (insightAccuracy) {
+                insightAccuracy.textContent = `${accuracyPct}% Avg Confidence`;
+            }
+
+            if (insightBlockers) {
+                insightBlockers.textContent = `${blockers} Blockers Detected`;
+            }
+
+            if (insightSummary) {
+                insightSummary.textContent = `Live comparison across ${uniquePayers.size} payers and ${items.length} policy rows from backend index.`;
+            }
+
+            if (avgTherapyDays) {
+                avgTherapyDays.textContent = `${estimatedDays.toFixed(1)} Days`;
+            }
+        }
+
+        function showDrugInfo(url, source, query) {
+            if (!url) {
+                drugInfoCard?.classList.add('hidden');
+                return;
+            }
+            if (drugInfoLink) {
+                drugInfoLink.href = url;
+                drugInfoLink.textContent = `Open ${query} information`;
+            }
+            if (drugInfoSource) {
+                drugInfoSource.textContent = `Source: ${source || 'medical reference'}`;
+            }
+            drugInfoCard?.classList.remove('hidden');
+        }
+
+        async function loadDrugInfo(query = '') {
+            if (!query || query.length < 2) {
+                drugInfoCard?.classList.add('hidden');
+                return;
+            }
+            try {
+                const resp = await fetch(`/api/oncology-search?drug=${encodeURIComponent(query)}`);
+                if (!resp.ok) {
+                    drugInfoCard?.classList.add('hidden');
+                    return;
+                }
+                const data = await resp.json();
+                showDrugInfo(data.info_url, data.source, data.normalized_query || query);
+            } catch (error) {
+                console.error('Failed to fetch oncology drug info link', error);
+                drugInfoCard?.classList.add('hidden');
+            }
+        }
+
+        async function loadMatrix(query = '', category = '') {
+            try {
+            const endpoint = buildEndpoint('/api/matrix', query, category);
                 const resp = await fetch(endpoint);
                 if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                 const data = await resp.json();
 
                 if (!data.matrix || data.matrix.length === 0) {
+                    currentMatrixItems = [];
+                    updateInsights([]);
                     tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-5 text-center text-slate-400">No policy matches found in the coverage index.</td></tr>';
                     return;
                 }
 
+                currentMatrixItems = Array.isArray(data.matrix) ? data.matrix : [];
+                updateInsights(data.matrix);
                 tbody.innerHTML = '';
                 let lastPayer = null;
 
@@ -288,6 +660,10 @@
                     const scoreColor = item.score >= 0.85 ? 'text-primary' : item.score >= 0.70 ? 'text-amber-600' : 'text-red-500';
                     const isNewPayer = item.payer !== lastPayer;
                     lastPayer = item.payer;
+                    const requirementText = item.requirements || '';
+                    const requirementPreview = requirementText.length > 180
+                        ? `${requirementText.slice(0, 180)}...`
+                        : requirementText;
 
                     const row = document.createElement('tr');
                     row.className = 'group transition-colors hover:bg-surface-container-low cursor-pointer';
@@ -297,6 +673,7 @@
                         </td>
                         <td class="px-4 py-4 border-b border-outline-variant/5">
                             <div class="font-semibold text-on-surface text-sm">${item.medication}</div>
+                            ${item.category ? `<div class="text-[10px] text-secondary uppercase tracking-wider mt-1">${item.category}</div>` : ''}
                             ${item.source ? `<a class="text-[10px] text-primary hover:underline" href="${item.source_url || '#'}" target="_blank" rel="noopener noreferrer">Source: ${item.source}</a>` : ''}
                         </td>
                         <td class="px-4 py-4 border-b border-outline-variant/5">
@@ -307,7 +684,7 @@
                                 <span class="material-symbols-outlined text-[14px]">${icon}</span>
                                 ${item.status}
                             </div>
-                            ${item.requirements ? `<p class="text-[10px] text-on-surface-variant mt-1.5 max-w-xs">${item.requirements}</p>` : ''}
+                            ${requirementPreview ? `<p class="text-[10px] text-on-surface-variant mt-1.5 max-w-xs">${requirementPreview}</p>` : ''}
                         </td>
                         <td class="px-4 py-4 border-b border-outline-variant/5">
                             <div class="flex items-center gap-2">
@@ -339,10 +716,27 @@
         searchInput?.addEventListener('input', (event) => {
             clearTimeout(searchDebounceTimer);
             const query = event.target.value.trim();
-            searchDebounceTimer = setTimeout(() => loadMatrix(query), 250);
+            const category = categoryFilter?.value || '';
+            searchDebounceTimer = setTimeout(() => {
+                loadMatrix(query, category);
+                loadComparison(query, category);
+                loadDrugInfo(query);
+            }, 250);
         });
 
-        await loadMatrix('');
+        categoryFilter?.addEventListener('change', () => {
+            const query = (searchInput?.value || '').trim();
+            const category = categoryFilter.value || '';
+            loadMatrix(query, category);
+            loadComparison(query, category);
+        });
+
+        exportButton?.addEventListener('click', exportFilteredRowsToExcel);
+
+        await loadCategories();
+        await loadMatrix('', categoryFilter?.value || '');
+        await loadComparison('', categoryFilter?.value || '');
+        updateScrollToBottomVisibility();
     });
 </script>
 </body></html>

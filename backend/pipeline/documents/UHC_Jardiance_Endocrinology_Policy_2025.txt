@@ -1,0 +1,34 @@
+UnitedHealthcare Endocrinology Medical Policy - Empagliflozin (Jardiance)
+Effective Date: March 2025 | Policy Number: UHC-ENDO-2025-JARDIANCE
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Type 2 Diabetes Mellitus with suboptimal control on first-line therapy (ICD-10: E11.9)
+- Type 2 Diabetes Mellitus with heart failure or high cardiovascular risk (ICD-10: E11.59)
+- Diabetic kidney disease requiring progression risk reduction (ICD-10: E11.22)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Prior authorization requires diagnosis confirmation, recent HbA1c, eGFR, urine albumin-creatinine ratio, and current antihyperglycemic therapy history.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Coverage is non-preferred when metformin and a formulary sulfonylurea or DPP-4 inhibitor have not been documented as tried or clinically inappropriate.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+No site-of-care restriction applies because therapy is oral and managed through routine outpatient pharmacy channels.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Dose starts at 10 mg orally once daily and may be increased to 25 mg daily with ongoing renal and volume-status monitoring.

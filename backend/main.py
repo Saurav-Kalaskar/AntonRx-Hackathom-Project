@@ -1,7 +1,10 @@
 import sqlite3
 import json
 import os
+import re
 from pathlib import Path
+from urllib.parse import quote_plus
+import httpx
 
 try:
     from .env_loader import load_env_once
@@ -101,6 +104,93 @@ def _ensure_history_schema() -> None:
 
 
 _ensure_history_schema()
+
+def _sanitize_search_term(term: str) -> str:
+    cleaned = re.sub(r"[^A-Za-z0-9\s\-()+/]", "", (term or ""))
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    return cleaned[:80]
+
+
+def _normalize_medication_name(raw_name: str) -> str:
+    value = " ".join((raw_name or "").split())
+    if not value:
+        return "Unknown Drug"
+
+    primary = re.split(r"\band\b", value, maxsplit=1, flags=re.IGNORECASE)[0].strip()
+    primary = re.sub(r"\bbiosimilars?\b", "", primary, flags=re.IGNORECASE).strip(" -,:;/")
+    if not primary:
+        return value
+
+    paren = re.search(r"([^()]+)\(([^()]+)\)", primary)
+    if paren:
+        left = paren.group(1).strip()
+        right = paren.group(2).strip()
+        if left and right:
+            return f"{left} / {right}"
+
+    return primary
+
+
+def _tokenize_term(text: str) -> List[str]:
+    return [tok for tok in re.split(r"[^A-Za-z0-9]+", (text or "").lower()) if tok]
+
+
+def _status_rank(status: str) -> int:
+    lowered = (status or "").lower()
+    if "non-preferred" in lowered:
+        return 3
+    if "step" in lowered or "block" in lowered:
+        return 2
+    if "covered" in lowered:
+        return 1
+    return 0
+
+
+def _compact_requirements(requirements: str) -> str:
+    compact = " ".join((requirements or "").split())
+    if len(compact) <= 160:
+        return compact
+    return compact[:157] + "..."
+
+
+def _build_dailymed_search_url(term: str) -> str:
+    return f"https://dailymed.nlm.nih.gov/dailymed/search.cfm?query={quote_plus(term)}"
+
+
+async def _lookup_openfda_drug_info(term: str) -> Dict[str, str] | None:
+    search = f'(openfda.brand_name:"{term}" OR openfda.generic_name:"{term}")'
+    endpoint = "https://api.fda.gov/drug/label.json"
+
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            response = await client.get(endpoint, params={"search": search, "limit": 1})
+
+        if response.status_code != 200:
+            return None
+
+        payload = response.json()
+        results = payload.get("results") or []
+        if not results:
+            return None
+
+        openfda = results[0].get("openfda", {})
+        set_id = (openfda.get("set_id") or [None])[0]
+        brand_name = (openfda.get("brand_name") or [None])[0]
+        generic_name = (openfda.get("generic_name") or [None])[0]
+
+        display_name = brand_name or generic_name or term
+        if set_id:
+            info_url = f"https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid={quote_plus(set_id)}"
+        else:
+            info_url = _build_dailymed_search_url(display_name)
+
+        return {
+            "display_name": display_name,
+            "info_url": info_url,
+            "source": "openFDA/DailyMed",
+        }
+    except Exception:
+        return None
 
 # ── Request / Response Models ─────────────────────────────────────────────────
 
@@ -230,9 +320,125 @@ async def get_history():
 
 
 @app.get("/api/matrix")
-async def get_matrix(query: str = "", payer: str = ""):
-    matrix = rag_engine.build_matrix(query=query, payer=payer)
+async def get_matrix(query: str = "", payer: str = "", category: str = ""):
+    matrix = rag_engine.build_matrix(query=query, payer=payer, category=category)
     return {"matrix": matrix}
+
+
+@app.get("/api/matrix/categories")
+async def get_matrix_categories():
+    return {"categories": rag_engine.list_categories()}
+
+
+@app.get("/api/matrix/compare")
+async def get_matrix_compare(query: str = "", category: str = "", limit: int = 8):
+    rows = rag_engine.build_matrix(query=query, payer="", category=category)
+    if not rows:
+        return {"payers": [], "comparison": [], "total_medications": 0}
+
+    payers = sorted({row.get("payer", "Unknown") for row in rows if row.get("payer")})
+    grouped: Dict[str, Dict[str, Any]] = {}
+
+    for row in rows:
+        medication = _normalize_medication_name(row.get("medication", ""))
+        score = float(row.get("score") or 0.0)
+        payer_name = row.get("payer", "Unknown")
+
+        group = grouped.setdefault(
+            medication,
+            {
+                "medication": medication,
+                "indication": row.get("indication", "General policy criteria"),
+                "requirements": _compact_requirements(row.get("requirements", "")),
+                "best_score": score,
+                "by_payer": {},
+            },
+        )
+
+        if score > group["best_score"]:
+            group["best_score"] = score
+            group["indication"] = row.get("indication", "General policy criteria")
+            group["requirements"] = _compact_requirements(row.get("requirements", ""))
+
+        payer_entry = group["by_payer"].get(payer_name)
+        if not payer_entry or score > float(payer_entry.get("score") or 0.0):
+            group["by_payer"][payer_name] = {
+                "status": row.get("status", "Unknown"),
+                "score": round(score, 4),
+                "source": row.get("source"),
+                "source_url": row.get("source_url"),
+                "requirements": _compact_requirements(row.get("requirements", "")),
+            }
+
+    comparison = []
+    for _, group in grouped.items():
+        blocker_count = sum(
+            1 for entry in group["by_payer"].values() if _status_rank(entry.get("status", "")) >= 2
+        )
+        comparison.append(
+            {
+                "medication": group["medication"],
+                "indication": group["indication"],
+                "requirements": group["requirements"],
+                "blocker_count": blocker_count,
+                "by_payer": group["by_payer"],
+            }
+        )
+
+    comparison.sort(key=lambda item: (-item["blocker_count"], item["medication"]))
+    safe_limit = max(1, min(20, int(limit)))
+
+    return {
+        "payers": payers,
+        "comparison": comparison[:safe_limit],
+        "total_medications": len(comparison),
+    }
+
+
+@app.get("/api/oncology-search")
+async def oncology_search(drug: str = ""):
+    sanitized = _sanitize_search_term(drug)
+    if not sanitized:
+        return {
+            "query": drug,
+            "normalized_query": "",
+            "info_url": None,
+            "source": None,
+        }
+
+    query_tokens = set(_tokenize_term(sanitized))
+    local_rows = rag_engine.build_matrix(query=sanitized)
+    local_matches = [
+        row
+        for row in local_rows
+        if query_tokens & set(_tokenize_term(str(row.get("medication", ""))))
+    ]
+    if local_matches:
+        best = max(local_matches, key=lambda row: float(row.get("score") or 0.0))
+        return {
+            "query": drug,
+            "normalized_query": sanitized,
+            "info_url": best.get("source_url"),
+            "source": "Local policy index",
+            "matched_name": best.get("medication"),
+        }
+
+    dynamic_result = await _lookup_openfda_drug_info(sanitized)
+    if dynamic_result:
+        return {
+            "query": drug,
+            "normalized_query": sanitized,
+            "info_url": dynamic_result["info_url"],
+            "source": dynamic_result["source"],
+            "matched_name": dynamic_result["display_name"],
+        }
+
+    return {
+        "query": drug,
+        "normalized_query": sanitized,
+        "info_url": _build_dailymed_search_url(sanitized),
+        "source": "DailyMed",
+    }
 
 
 if __name__ == "__main__":

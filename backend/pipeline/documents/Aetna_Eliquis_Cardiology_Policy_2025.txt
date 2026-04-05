@@ -1,0 +1,34 @@
+Aetna Cardiology Medical Policy - Apixaban (Eliquis)
+Effective Date: April 2025 | Policy Number: AET-CARD-2025-ELIQUIS
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Nonvalvular Atrial Fibrillation stroke prevention (ICD-10: I48.91)
+- Treatment of deep vein thrombosis and pulmonary embolism (ICD-10: I82.409, I26.99)
+- Reduction of recurrent DVT and PE risk after completion of initial therapy
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Requests must include diagnosis confirmation, renal and hepatic function, body weight, and baseline bleeding risk review. Medication reconciliation is required for anticoagulant interactions.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires trial of at least one formulary anticoagulant alternative when clinically safe. Exceptions apply for prior major bleeding on alternative regimens.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Oral anticoagulation is authorized for outpatient management without infusion center requirement.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Typical dose is 5 mg orally twice daily, with 2.5 mg twice daily dose-reduction criteria based on age, weight, and creatinine thresholds.

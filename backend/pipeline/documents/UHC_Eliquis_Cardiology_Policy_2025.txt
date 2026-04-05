@@ -1,0 +1,34 @@
+UnitedHealthcare Cardiology Medical Policy - Apixaban (Eliquis)
+Effective Date: April 2025 | Policy Number: UHC-CARD-2025-ELIQUIS
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Nonvalvular atrial fibrillation stroke prevention (ICD-10: I48.91)
+- DVT and PE treatment with continuation into secondary prevention (ICD-10: I82.409, I26.99)
+- Peri-discharge thrombosis prevention in high-risk medically ill adults when clinically justified
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Coverage requires diagnosis confirmation, medication history, baseline renal function, and bleeding risk stratification. Requests must include any history of intracranial hemorrhage.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy is required unless patient has instability on warfarin despite monitoring or documented adverse effects with other preferred anticoagulants.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Therapy is covered for outpatient dispensing and routine ambulatory follow-up without infusion setting restrictions.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Recommended dose is 5 mg orally twice daily and can be reduced to 2.5 mg twice daily when dosing criteria are met.

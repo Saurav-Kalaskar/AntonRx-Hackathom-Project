@@ -1,0 +1,33 @@
+UnitedHealthcare Neurology Medical Policy - Ocrelizumab (Ocrevus)
+Effective Date: June 2025 | Policy Number: UHC-NEUR-2025-OCREVUS
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Relapsing-remitting multiple sclerosis with objective clinical or radiographic progression (ICD-10: G35)
+- Primary progressive multiple sclerosis with worsening disability trajectory (ICD-10: G35)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Coverage requires specialist documentation, MRI evidence, baseline CBC, liver panel, hepatitis B screening, and immunoglobulin status review.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Coverage is non-preferred when lower-cost disease-modifying agents have not been attempted and no high-activity disease rationale is provided.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Infusions are authorized in ambulatory infusion centers and hospital outpatient departments with emergency support availability.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Loading consists of 300 mg intravenous infusions two weeks apart, followed by maintenance infusion of 600 mg every six months.

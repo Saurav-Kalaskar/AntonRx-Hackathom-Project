@@ -1,0 +1,33 @@
+Cigna Neurology Medical Policy - Ocrelizumab (Ocrevus)
+Effective Date: June 2025 | Policy Number: CIG-NEUR-2025-OCREVUS
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Relapsing forms of multiple sclerosis with clinical or MRI activity (ICD-10: G35)
+- Primary progressive multiple sclerosis in adults with documented neurological decline (ICD-10: G35)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Prior authorization requires neurology consultation, MRI reports, baseline immunoglobulin levels, hepatitis screening, and prior disease-modifying therapy history.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires trial of one preferred disease-modifying therapy unless rapidly evolving severe disease is documented by MRI and clinical relapse burden.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Infusion must occur in accredited outpatient infusion center with monitoring capabilities for infusion reactions.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Initial course includes two 300 mg infusions separated by two weeks followed by 600 mg intravenous infusion every six months.

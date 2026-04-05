@@ -1,0 +1,34 @@
+Cigna Endocrinology Medical Policy - Empagliflozin (Jardiance)
+Effective Date: March 2025 | Policy Number: CIG-ENDO-2025-JARDIANCE
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Type 2 Diabetes Mellitus with HbA1c above individualized target despite lifestyle modification (ICD-10: E11.9)
+- Type 2 Diabetes Mellitus with heart failure risk profile and need for cardiometabolic risk reduction (ICD-10: E11.59)
+- CKD risk reduction in Type 2 Diabetes with albuminuria (ICD-10: E11.22)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Coverage requires documented diagnosis, problem list, recent HbA1c, and baseline renal function. The provider must submit recent blood pressure and volume status assessment.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires trial of metformin and one additional lower-cost oral antihyperglycemic unless contraindicated or not tolerated. Non-preferred requests must include rationale for bypassing formulary alternatives.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Medication is eligible through standard outpatient dispensing with adherence monitoring through the chronic care pathway.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Recommended dose is 10 mg once daily with optional titration to 25 mg once daily after four weeks when clinically appropriate.

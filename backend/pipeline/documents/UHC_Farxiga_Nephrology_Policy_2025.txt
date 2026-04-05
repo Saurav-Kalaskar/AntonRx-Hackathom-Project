@@ -1,0 +1,34 @@
+UnitedHealthcare Nephrology Medical Policy - Dapagliflozin (Farxiga)
+Effective Date: August 2025 | Policy Number: UHC-NEPH-2025-FARXIGA
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Chronic kidney disease progression risk reduction in adults with albuminuric kidney disease (ICD-10: N18.9)
+- Type 2 Diabetes Mellitus with chronic kidney disease and elevated renal risk profile (ICD-10: E11.22)
+- Heart failure with reduced ejection fraction with renal-protective treatment objectives (ICD-10: I50.22)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Requests must include CKD staging, baseline eGFR, urine albumin-creatinine ratio, and current renin-angiotensin system therapy plan.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires documented use of ACE inhibitor or ARB unless contraindicated, plus clinical rationale for SGLT2 inhibitor initiation.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Therapy is managed as outpatient oral treatment with periodic laboratory monitoring and nephrology follow-up as indicated.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Dose is 10 mg orally once daily with continuation based on renal trajectory and overall clinical benefit.

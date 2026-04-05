@@ -1,0 +1,34 @@
+UnitedHealthcare Pulmonology Medical Policy - Dupilumab (Dupixent)
+Effective Date: May 2025 | Policy Number: UHC-PULM-2025-DUPIXENT
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Severe asthma with eosinophilic phenotype and frequent exacerbations despite high-intensity controller therapy (ICD-10: J45.50)
+- Corticosteroid-dependent asthma where biologic therapy is clinically necessary to reduce oral steroid burden (ICD-10: J45.52)
+- Chronic rhinosinusitis with nasal polyposis refractory to intranasal corticosteroid therapy (ICD-10: J33.9)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Coverage requires spirometry findings, blood eosinophil level, exacerbation history, and verification of inhaler adherence with proper technique.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Coverage is non-preferred if patient has not completed guideline-based inhaled therapy optimization and specialist evaluation.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+First administration is covered in outpatient specialty care; subsequent doses may be administered at home after education and tolerance confirmation.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Recommended maintenance dosing is 300 mg subcutaneous every two weeks with ongoing assessment of exacerbation reduction and steroid minimization.

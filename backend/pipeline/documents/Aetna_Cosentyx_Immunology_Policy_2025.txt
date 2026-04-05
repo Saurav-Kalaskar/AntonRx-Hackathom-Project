@@ -1,0 +1,34 @@
+Aetna Immunology Medical Policy - Secukinumab (Cosentyx)
+Effective Date: July 2025 | Policy Number: AET-IMM-2025-COSENTYX
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Moderate-to-severe plaque psoriasis in adults requiring systemic therapy (ICD-10: L40.0)
+- Active psoriatic arthritis with inadequate response to conventional therapy (ICD-10: L40.50)
+- Active ankylosing spondylitis and non-radiographic axial spondyloarthritis (ICD-10: M45.9)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Requests must include specialist diagnosis, affected body surface area or disease activity score, prior therapy history, and screening for tuberculosis.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires trial of methotrexate or other systemic non-biologic treatment unless contraindicated due to toxicity risk or comorbid conditions.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+Subcutaneous biologic administration is covered in outpatient settings with allowance for home administration after patient training.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Typical regimen is 300 mg subcutaneous weekly for five weeks followed by 300 mg every four weeks for maintenance.

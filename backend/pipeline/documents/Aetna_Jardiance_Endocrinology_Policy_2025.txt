@@ -1,0 +1,35 @@
+Aetna Endocrinology Medical Policy - Empagliflozin (Jardiance)
+Effective Date: February 2025 | Policy Number: AET-ENDO-2025-JARDIANCE
+
+================================================================================
+SECTION 1: Covered Indications
+================================================================================
+
+- Type 2 Diabetes Mellitus with inadequate glycemic control on metformin (ICD-10: E11.9)
+- Type 2 Diabetes Mellitus with established atherosclerotic cardiovascular disease (ICD-10: E11.59)
+- Chronic Kidney Disease associated with Type 2 Diabetes (ICD-10: E11.22)
+
+================================================================================
+SECTION 2: Prior Authorization Requirements
+================================================================================
+
+Approval requires documented diagnosis, baseline HbA1c, current medication list, and provider plan for renal monitoring.
+Requests must include recent eGFR and confirmation that the patient is not in diabetic ketoacidosis at initiation.
+
+================================================================================
+SECTION 3: Step Therapy Requirements
+================================================================================
+
+Step therapy requires trial of metformin for at least 90 days unless contraindicated by severe gastrointestinal intolerance or chronic kidney disease stage requiring alternate strategy.
+
+================================================================================
+SECTION 4: Site of Care Restrictions
+================================================================================
+
+This oral therapy is covered under outpatient pharmacy and ambulatory management programs with no infusion site requirement.
+
+================================================================================
+SECTION 5: Dosing and Administration
+================================================================================
+
+Initial dose is 10 mg orally once daily and may be increased to 25 mg daily based on clinical response and tolerability.
