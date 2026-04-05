@@ -2,30 +2,6 @@
 
 ## Time-to-Therapy Prior Authorization Copilot
 
-## Quick Start
-1. Install dependencies:
-```bash
-python -m pip install -r backend/aws_deployment_config/requirements.txt
-```
-2. Configure environment variables in a root `.env` file:
-```env
-NVIDIA_API_KEY=your_key_here
-STRICT_LLM_MODE=true
-ALLOWED_ORIGINS=http://localhost:8005,http://127.0.0.1:8005
-```
-3. Start the API server:
-```bash
-python -m uvicorn backend.main:app --host 0.0.0.0 --port 8005
-```
-4. Open the product views:
-- `http://127.0.0.1:8005/matrix`
-- `http://127.0.0.1:8005/copilot`
-- `http://127.0.0.1:8005/history`
-5. Run QA verification:
-```bash
-python backend/qa_smoke_test.py
-```
-
 ### What Major Problem This Solves
 Specialty medication prior authorization (PA) is slow, manual, and policy-fragmented across payers. Teams often lose time searching long policy documents, comparing criteria payer by payer, and drafting appeal or authorization letters under tight timelines.
 
@@ -61,7 +37,7 @@ The application combines three capabilities in one workflow:
 - OpenAI-compatible NVIDIA NIM endpoint for Nemotron generation.
 
 ### Frontend
-- Static HTML/CSS/JavaScript pages under `site/public`.
+- HTML/CSS/JavaScript pages under `site/public`.
 - Tailwind CSS for styling.
 - Direct integration with backend APIs for matrix, draft, and history.
 
@@ -152,7 +128,7 @@ The suite verifies:
 - and frontend-to-backend wiring assertions.
 
 ## Repository Structure (Key Paths)
-- `backend/main.py` - API + static route entrypoint
+- `backend/main.py` - API + Frontend route entrypoint
 - `backend/pipeline/rag_engine.py` - policy parsing, indexing, retrieval
 - `backend/generator/drafter.py` - draft generation
 - `backend/qa_smoke_test.py` - regression checks
