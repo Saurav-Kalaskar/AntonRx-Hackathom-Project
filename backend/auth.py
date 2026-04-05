@@ -1,6 +1,9 @@
 import json
 import os
 import time
+import base64
+import hmac
+import hashlib
 from typing import Any, Dict, Optional
 
 import httpx
@@ -89,15 +92,16 @@ def _get_session_secret(settings: Dict[str, Any]) -> str:
     return "time-to-therapy-dev-session-secret"
 
 
-def issue_app_session_token(user_claims: Dict[str, Any], settings: Dict[str, Any]) -> str:
-    try:
-        import jwt
-    except Exception as exc:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Session token dependency missing: {exc}",
-        )
+def _b64url_encode(raw: bytes) -> str:
+    return base64.urlsafe_b64encode(raw).rstrip(b"=").decode("ascii")
 
+
+def _b64url_decode(raw: str) -> bytes:
+    padding = "=" * (-len(raw) % 4)
+    return base64.urlsafe_b64decode((raw + padding).encode("ascii"))
+
+
+def issue_app_session_token(user_claims: Dict[str, Any], settings: Dict[str, Any]) -> str:
     now = int(time.time())
     ttl_seconds = _get_session_ttl_seconds()
 
@@ -110,30 +114,47 @@ def issue_app_session_token(user_claims: Dict[str, Any], settings: Dict[str, Any
         "iss": "time-to-therapy-app",
     }
 
-    token = jwt.encode(payload, _get_session_secret(settings), algorithm="HS256")
-    return token
+    header = {"alg": "HS256", "typ": "JWT"}
+    header_b64 = _b64url_encode(json.dumps(header, separators=(",", ":")).encode("utf-8"))
+    payload_b64 = _b64url_encode(json.dumps(payload, separators=(",", ":")).encode("utf-8"))
+    signing_input = f"{header_b64}.{payload_b64}".encode("ascii")
+    signature = hmac.new(
+        _get_session_secret(settings).encode("utf-8"),
+        signing_input,
+        hashlib.sha256,
+    ).digest()
+    return f"{header_b64}.{payload_b64}.{_b64url_encode(signature)}"
 
 
 def verify_app_session_token(session_token: str, settings: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-    try:
-        import jwt
-        from jwt.exceptions import InvalidTokenError
-    except Exception:
-        return None
-
     if not session_token:
         return None
 
     try:
-        payload = jwt.decode(
-            session_token,
-            _get_session_secret(settings),
-            algorithms=["HS256"],
-            options={"verify_aud": False},
-        )
+        parts = session_token.split(".")
+        if len(parts) != 3:
+            return None
+
+        header_b64, payload_b64, signature_b64 = parts
+        signing_input = f"{header_b64}.{payload_b64}".encode("ascii")
+        expected_signature = hmac.new(
+            _get_session_secret(settings).encode("utf-8"),
+            signing_input,
+            hashlib.sha256,
+        ).digest()
+
+        provided_signature = _b64url_decode(signature_b64)
+        if not hmac.compare_digest(expected_signature, provided_signature):
+            return None
+
+        payload_raw = _b64url_decode(payload_b64)
+        payload = json.loads(payload_raw.decode("utf-8"))
+
+        exp = int(payload.get("exp", 0) or 0)
+        if exp and int(time.time()) > exp:
+            return None
+
         return payload
-    except InvalidTokenError:
-        return None
     except Exception:
         return None
 
