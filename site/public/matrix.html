@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Time-to-Therapy | Coverage Matrix</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+        .therapy-track {
+            position: relative;
+        }
+        .therapy-track::before {
+            content: '';
+            position: absolute;
+            left: 12px;
+            top: 0;
+            bottom: 0;
+            width: 6px;
+            background: #71f8e4; /* primary_fixed */
+            border-radius: 3px;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#fffbff",
+                        "inverse-primary": "#4fdbc8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed": "#2a1700",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffddb8",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "on-surface": "#191c1e",
+                        "surface-container-high": "#e6e8ea",
+                        "primary-fixed-dim": "#4fdbc8",
+                        "on-primary-container": "#f4fffb",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-surface-variant": "#3d4949",
+                        "secondary-container": "#d5e3fc",
+                        "on-secondary-container": "#57657a",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "on-primary-fixed": "#00201c",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "background": "#f7f9fb",
+                        "outline-variant": "#bcc9c8",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-surface": "#2d3133",
+                        "surface-container": "#eceef0",
+                        "surface-dim": "#d8dadc",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "outline": "#6d7979",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-secondary": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "primary-container": "#008376",
+                        "on-background": "#191c1e",
+                        "tertiary-container": "#a36700",
+                        "secondary": "#515f74",
+                        "primary-fixed": "#71f8e4",
+                        "tertiary": "#825100",
+                        "on-error-container": "#93000a",
+                        "primary": "#00685d",
+                        "surface-tint": "#006b5f",
+                        "on-primary-fixed-variant": "#005048"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "1rem",
+                        "xl": "1.25rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Manrope", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-slate-50/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-teal-700 dark:text-teal-400" data-icon="clinical_notes">clinical_notes</span>
+<h1 class="text-xl font-bold tracking-tight text-teal-800 dark:text-teal-300 font-headline">Time-to-Therapy</h1>
+</div>
+<!-- Web Nav Cluster (Hidden on Mobile) -->
+<nav class="hidden md:flex items-center gap-8 font-headline text-sm font-semibold tracking-tight">
+<a class="text-teal-700 dark:text-teal-400 border-b-2 border-teal-600 pb-1" href="/matrix">Matrix</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors" href="/copilot">Copilot</a>
+<a class="text-slate-500 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-300 transition-colors" href="/history">History</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-teal-700 dark:text-teal-400" data-icon="search">search</span>
+</div>
+</div>
+<div class="bg-slate-200/50 dark:bg-slate-800/50 h-[1px]"></div>
+</header>
+<main class="pt-20 pb-24 px-4 md:px-8 max-w-7xl mx-auto space-y-6">
+<!-- Search Hero Section -->
+<section class="mt-4">
+<div class="p-6 rounded-xl bg-gradient-to-br from-primary to-primary-container text-on-primary shadow-lg overflow-hidden relative">
+<div class="relative z-10">
+<h2 class="text-2xl font-headline font-extrabold mb-4">Oncology Market Access</h2>
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-primary/60" data-icon="search">search</span>
+<input id="matrix-search" class="w-full bg-white/10 border-white/20 rounded-lg pl-12 pr-4 py-3 text-on-primary placeholder-on-primary/50 focus:ring-2 focus:ring-primary-fixed/40 focus:border-transparent outline-none backdrop-blur-sm transition-all font-body" placeholder="Search drug (e.g. Keytruda, Opdivo)" type="text"/>
+</div>
+</div>
+<!-- Abstract decorative element -->
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-primary-fixed/20 rounded-full blur-3xl"></div>
+</div>
+</section>
+<!-- Insights Summary (Asymmetric Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="md:col-span-2 p-6 rounded-lg bg-surface-container-lowest border border-outline-variant/15 flex flex-col justify-between">
+<div>
+<span class="text-label-md font-semibold text-secondary uppercase tracking-widest text-[10px]">Real-time Live API Data</span>
+<h3 class="text-2xl font-headline font-bold text-on-surface mt-1">Coverage Matrix Directory</h3>
+<p class="text-sm text-on-surface-variant mt-2 max-w-md">Real-time coverage comparison across payers, dynamically loading from the local backend.</p>
+</div>
+<div class="mt-6 flex gap-3">
+<div class="bg-primary-container/10 px-3 py-1.5 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-primary" data-icon="verified">verified</span>
+<span class="text-xs font-semibold text-primary">High Accuracy</span>
+</div>
+<div class="bg-tertiary-container/10 px-3 py-1.5 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary" data-icon="warning">warning</span>
+<span class="text-xs font-semibold text-tertiary">2 Blockers Detected</span>
+</div>
+</div>
+</div>
+<div class="p-6 rounded-lg bg-surface-container-high border border-outline-variant/15 flex flex-col items-center justify-center text-center">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center mb-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="speed">speed</span>
+</div>
+<span class="text-xs font-bold text-secondary uppercase tracking-tight">Avg. Time-to-Therapy</span>
+<span class="text-3xl font-headline font-extrabold text-primary">14.2 Days</span>
+</div>
+</div>
+<!-- Coverage Matrix Table -->
+<section class="space-y-4">
+<div class="flex justify-between items-end px-1">
+<h3 class="text-lg font-headline font-bold">Cross-Payer Matrix</h3>
+<div class="flex gap-2">
+<button class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-secondary px-3 py-1 rounded-full bg-surface-container border border-outline-variant/20">
+<span class="material-symbols-outlined text-sm" data-icon="filter_list">filter_list</span> Filter
+                    </button>
+<button class="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-primary px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+<span class="material-symbols-outlined text-sm" data-icon="download">download</span> Export
+                    </button>
+</div>
+</div>
+<div class="overflow-x-auto rounded-lg border border-outline-variant/15 shadow-sm bg-surface-container-lowest">
+<table class="w-full border-collapse text-left">
+<thead>
+<tr class="bg-surface-container-low">
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Payer</th>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Medication</th>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Indication</th>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Coverage Status</th>
+<th class="px-4 py-4 text-xs font-bold uppercase tracking-widest text-secondary border-b border-outline-variant/10">Match Score</th>
+</tr>
+</thead>
+<tbody class="text-sm" id="matrix-tbody">
+<!-- Dynamic content will be injected here via JS -->
+<tr><td colspan="5" class="px-4 py-5 text-center text-slate-400 italic">Loading live data...</td></tr>
+</tbody>
+</table>
+</div>
+<p class="text-[10px] text-on-surface-variant px-1 italic">
+                * Data sourced from real-time payer portals and recent oncology medical policies as of October 2023. Click on markers for full policy text.
+            </p>
+</section>
+<!-- Therapy Timeline Component -->
+<section class="space-y-4">
+<h3 class="text-lg font-headline font-bold">Typical Access Pathway</h3>
+<div class="p-6 rounded-lg bg-surface-container shadow-sm therapy-track">
+<div class="space-y-8 pl-8">
+<div class="relative">
+<div class="absolute -left-10 top-0 w-6 h-6 rounded-full bg-primary border-4 border-primary-fixed flex items-center justify-center"></div>
+<h4 class="text-sm font-bold text-on-surface">Diagnosis &amp; Biomarker Testing</h4>
+<p class="text-xs text-on-surface-variant">PD-L1 expression levels verified.</p>
+</div>
+<div class="relative">
+<div class="absolute -left-10 top-0 w-6 h-6 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xs" data-icon="smart_toy">smart_toy</span>
+</div>
+<h4 class="text-sm font-bold text-on-surface">Copilot AI Review</h4>
+<p class="text-xs text-on-surface-variant">Payer policy match identified. Documentation auto-filled.</p>
+</div>
+<div class="relative opacity-50">
+<div class="absolute -left-10 top-0 w-6 h-6 rounded-full bg-surface-container-highest border-2 border-outline-variant flex items-center justify-center"></div>
+<h4 class="text-sm font-bold text-on-surface">Step-Therapy Clearance</h4>
+<p class="text-xs text-on-surface-variant">Pending documentation of prior platinum-based failure.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-t-2xl border-t border-slate-100 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.03)] md:hidden">
+<a class="flex flex-col items-center justify-center bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 rounded-xl px-3 py-1 active:scale-95 transition-transform" href="/matrix">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-manrope text-[10px] font-medium">Matrix</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800" href="/copilot">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-manrope text-[10px] font-medium">Copilot</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800" href="/history">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-manrope text-[10px] font-medium">History</span>
+</a>
+</nav>
+<!-- FAB (Suppressed based on context rules, but adding an AI Copilot floating trigger as secondary action) -->
+<a href="/copilot" class="fixed bottom-24 right-6 w-14 h-14 bg-gradient-to-br from-primary to-primary-container rounded-full shadow-xl flex items-center justify-center text-on-primary md:bottom-8 z-40 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-2xl" data-icon="smart_toy" data-weight="fill" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</a>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const tbody = document.getElementById('matrix-tbody');
+        const searchInput = document.getElementById('matrix-search');
+        let searchDebounceTimer;
+
+        async function loadMatrix(query = '') {
+            try {
+                const endpoint = query ? `/api/matrix?query=${encodeURIComponent(query)}` : '/api/matrix';
+                const resp = await fetch(endpoint);
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                const data = await resp.json();
+
+                if (!data.matrix || data.matrix.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="px-4 py-5 text-center text-slate-400">No policy matches found in the coverage index.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = '';
+                let lastPayer = null;
+
+                data.matrix.forEach(item => {
+                    let statusClass = 'bg-secondary-container/50 text-secondary';
+                    let icon = 'schedule';
+
+                    const statusLower = (item.status || '').toLowerCase();
+                    if (statusLower.includes('requires step') || statusLower.includes('step therapy') || statusLower.includes('block')) {
+                        statusClass = 'bg-amber-50 text-amber-800 border border-amber-200';
+                        icon = 'warning';
+                    } else if (statusLower.includes('non-preferred')) {
+                        statusClass = 'bg-red-50 text-red-700 border border-red-200';
+                        icon = 'block';
+                    } else if (statusLower.includes('covered')) {
+                        statusClass = 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+                        icon = 'check_circle';
+                    }
+
+                    const scoreBar = Math.round((item.score || 0) * 100);
+                    const scoreColor = item.score >= 0.85 ? 'text-primary' : item.score >= 0.70 ? 'text-amber-600' : 'text-red-500';
+                    const isNewPayer = item.payer !== lastPayer;
+                    lastPayer = item.payer;
+
+                    const row = document.createElement('tr');
+                    row.className = 'group transition-colors hover:bg-surface-container-low cursor-pointer';
+                    row.innerHTML = `
+                        <td class="px-4 py-4 border-b border-outline-variant/5">
+                            ${isNewPayer ? `<span class="font-bold text-on-surface">${item.payer}</span>` : `<span class="text-slate-300 text-xs pl-2">└</span>`}
+                        </td>
+                        <td class="px-4 py-4 border-b border-outline-variant/5">
+                            <div class="font-semibold text-on-surface text-sm">${item.medication}</div>
+                            ${item.source ? `<a class="text-[10px] text-primary hover:underline" href="${item.source_url || '#'}" target="_blank" rel="noopener noreferrer">Source: ${item.source}</a>` : ''}
+                        </td>
+                        <td class="px-4 py-4 border-b border-outline-variant/5">
+                            <div class="text-xs text-on-surface-variant max-w-xs">${item.indication || '-'}</div>
+                        </td>
+                        <td class="px-4 py-4 border-b border-outline-variant/5">
+                            <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${statusClass} text-[11px] font-bold">
+                                <span class="material-symbols-outlined text-[14px]">${icon}</span>
+                                ${item.status}
+                            </div>
+                            ${item.requirements ? `<p class="text-[10px] text-on-surface-variant mt-1.5 max-w-xs">${item.requirements}</p>` : ''}
+                        </td>
+                        <td class="px-4 py-4 border-b border-outline-variant/5">
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-surface-container-highest rounded-full h-1.5 w-16">
+                                    <div class="h-1.5 rounded-full ${item.score >= 0.85 ? 'bg-primary' : item.score >= 0.70 ? 'bg-amber-500' : 'bg-red-400'}" style="width:${scoreBar}%"></div>
+                                </div>
+                                <span class="text-xs font-bold ${scoreColor}">${scoreBar}%</span>
+                            </div>
+                        </td>
+                    `;
+
+                    row.addEventListener('click', () => {
+                        const params = new URLSearchParams({
+                            payer: item.payer || '',
+                            medication: item.medication || '',
+                            diagnosis: item.indication || ''
+                        });
+                        window.location.href = `/copilot?${params.toString()}`;
+                    });
+
+                    tbody.appendChild(row);
+                });
+            } catch (e) {
+                console.error('Failed to fetch matrix data', e);
+                tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-5 text-center text-red-500 font-bold">Error loading policy matrix: ${e.message}</td></tr>`;
+            }
+        }
+
+        searchInput?.addEventListener('input', (event) => {
+            clearTimeout(searchDebounceTimer);
+            const query = event.target.value.trim();
+            searchDebounceTimer = setTimeout(() => loadMatrix(query), 250);
+        });
+
+        await loadMatrix('');
+    });
+</script>
+</body></html>

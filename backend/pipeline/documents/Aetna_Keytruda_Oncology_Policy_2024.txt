@@ -1,0 +1,97 @@
+Aetna Oncology Drug Policy — Pembrolizumab (Keytruda)
+Effective Date: January 2024 | Policy Number: AOD-2024-KEYTRUDA-001
+
+================================================================================
+SECTION 1: OVERVIEW AND INDICATION
+================================================================================
+
+Pembrolizumab (Keytruda) is a programmed death receptor-1 (PD-1)-blocking antibody
+indicated for the treatment of multiple solid tumors and hematologic malignancies.
+This policy applies to Aetna commercial, exchange, and managed Medicare Advantage plans.
+
+COVERED INDICATIONS (Medical Benefit / Buy-and-Bill):
+- Non-Small Cell Lung Cancer (NSCLC): First-line monotherapy for PD-L1 TPS ≥ 50% (ICD-10: C34.9)
+- NSCLC: First-line combination with chemotherapy (carboplatin + paclitaxel or pemetrexed) regardless of PD-L1 status
+- NSCLC: Second-line monotherapy for PD-L1 TPS ≥ 1% after progression on platinum-based chemo
+- Head and Neck Squamous Cell Carcinoma (HNSCC): First-line with chemotherapy or monotherapy for PD-L1 CPS ≥ 1
+- Triple-Negative Breast Cancer (TNBC): Combination with chemotherapy for PD-L1 CPS ≥ 10
+- Melanoma: Adjuvant and metastatic settings
+- Colorectal Cancer (MSI-H/dMMR): First-line for metastatic CRC
+- Tumor Mutational Burden-High (TMB-H ≥ 10 mut/Mb): Unresectable or metastatic solid tumors
+
+================================================================================
+SECTION 2: PRIOR AUTHORIZATION CRITERIA
+================================================================================
+
+ALL of the following conditions must be met for Prior Authorization approval:
+
+2.1 BIOMARKER TESTING REQUIREMENTS
+- PD-L1 expression (TPS or CPS) must be documented using an FDA-approved companion diagnostic (22C3 antibody assay)
+- For NSCLC first-line monotherapy: TPS ≥ 50% is required
+- For NSCLC combination regimens: PD-L1 testing recommended but no minimum threshold applies
+- For HNSCC: CPS ≥ 1 using 22C3 PharmDx assay
+- Molecular profiling is required to rule out EGFR mutations and ALK rearrangements before initiating PD-1/PD-L1 therapy in NSCLC patients
+
+2.2 STEP THERAPY REQUIREMENTS
+- First-line NSCLC (no actionable mutations, PD-L1 TPS ≥ 50%): Keytruda approved as first-line; no prior therapy required
+- Second-line NSCLC: Patient must have documented disease progression on or after platinum-based doublet chemotherapy
+- TNBC: Prior trial of anthracycline-based or taxane-based chemotherapy required unless contraindicated
+- HNSCC recurrent/metastatic: Must document unresectability or prior platinum-based therapy failure
+
+2.3 DOCUMENTATION REQUIREMENTS FOR PA REQUEST
+Each PA request must include:
+1. Pathology report confirming diagnosis with ICD-10 code
+2. PD-L1 testing report with assay name, antibody clone, and exact percentage (TPS or CPS)
+3. Molecular testing results (EGFR/ALK for NSCLC; MSI/MMR for CRC)
+4. ECOG performance status (0-1 required for most indications; ECOG 2 requires justification)
+5. Prior treatment history documenting step therapy when applicable
+6. Most recent imaging (within 90 days) confirming measurable disease
+7. Prescriber attestation of medical necessity
+
+================================================================================
+SECTION 3: DOSING AND ADMINISTRATION
+================================================================================
+
+Standard Dosing:
+- 200 mg IV every 3 weeks (Q3W), OR
+- 400 mg IV every 6 weeks (Q6W)
+- Duration: Until disease progression, unacceptable toxicity, or maximum 24 months (2 years)
+
+Site of Care Requirements:
+- IV administration must occur in hospital outpatient infusion center, physician office infusion suite, or accredited ambulatory infusion center
+- Home infusion is NOT covered for Keytruda
+- Buy-and-Bill billing through medical benefit (J9271)
+
+================================================================================
+SECTION 4: STEP THERAPY APPEAL PROCESS
+================================================================================
+
+If Step Therapy Exception is requested, the following criteria must be met:
+- The step therapy required drug is contraindicated based on documented allergy, adverse reaction, or drug interaction
+- The required step therapy drug is clinically inferior or inappropriate for the patient's specific tumor type or molecular profile
+- The patient has already tried and failed the required step therapy drug (documented in treatment records)
+- The treating physician demonstrates medical necessity with peer-reviewed literature
+
+================================================================================
+SECTION 5: AUTHORIZATION DURATION AND RENEWAL
+================================================================================
+
+Initial Authorization: 6 months (2 treatment cycles per authorization period)
+Renewal Requirements:
+- Evidence of continued clinical benefit (stable disease, partial response, or complete response)
+- No evidence of disease progression per RECIST 1.1 criteria
+- Documentation of tolerability (no grade 3-4 immune-related adverse events requiring discontinuation)
+- Updated ECOG performance status
+
+Maximum Authorization Duration: 24 months from initiation date
+
+================================================================================
+SECTION 6: EXCLUSIONS
+================================================================================
+
+Keytruda is NOT covered for:
+- Patients with active autoimmune conditions requiring systemic treatment
+- Patients on systemic corticosteroids (>10mg prednisone/day equivalent) unless for adrenal insufficiency or thyroid replacement
+- Prior organ transplant recipients (solid organ or allogeneic stem cell)
+- Active interstitial lung disease or pneumonitis
+- Combination with other checkpoint inhibitors (ipilimumab) except in approved clinical trial protocols

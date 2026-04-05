@@ -1,0 +1,84 @@
+Cigna Dermatology & Inflammatory Disease Policy — Ustekinumab (Stelara)
+Effective Date: January 2024 | Policy Number: CDI-2024-STELARA-002
+
+================================================================================
+SECTION 1: COVERED INDICATIONS
+================================================================================
+
+Ustekinumab (Stelara) is a human monoclonal antibody targeting the p40 subunit of
+interleukin-12 (IL-12) and interleukin-23 (IL-23), approved for:
+- Plaque Psoriasis (moderate-to-severe): Adults and pediatric patients ≥6 years (ICD-10: L40.0)
+- Psoriatic Arthritis: Adults (ICD-10: M07.3)
+- Crohn's Disease: Moderately to severely active, adult patients (ICD-10: K50.9)
+- Ulcerative Colitis: Moderately to severely active, adult patients (ICD-10: K51.9)
+
+================================================================================
+SECTION 2: PRIOR AUTHORIZATION CRITERIA
+================================================================================
+
+2.1 PLAQUE PSORIASIS — STEP THERAPY REQUIREMENTS
+Cigna requires the following step therapy before approving Stelara for plaque psoriasis:
+
+Step 1 (required, minimum 12-week trial):
+- Conventional systemic therapy:
+  - Methotrexate (oral, minimum 15 mg/week titrated) OR
+  - Cyclosporine (3-5 mg/kg/day) OR
+  - Acitretin
+
+Step 2 (required after Step 1 failure for TNF-naive patients):
+- At least ONE TNF-alpha inhibitor (adalimumab/Humira preferred brand, OR etanercept):
+  - Minimum trial duration: 12 consecutive weeks
+  - Documented inadequate response (BSA improvement < 50% from baseline) or intolerance
+
+Stelara may be approved first-line WITHOUT step therapy if:
+- Patient has a documented contraindication to methotrexate (hepatic disease, pregnancy risk, significant cytopenias)
+- TNF inhibitors are contraindicated (active demyelinating disease, CHF NYHA Class III/IV, history of lymphoma)
+- Patient has body surface area (BSA) involvement ≥ 10% with DLQI > 10
+
+2.2 CROHN'S DISEASE — CRITERIA
+- Crohn's Disease Activity Index (CDAI) ≥ 220 or Harvey-Bradshaw Index ≥ 8 at baseline
+- Patient must have failed or been intolerant to conventional therapy:
+  - Corticosteroids (prednisone ≥ 40mg/day for ≥ 4 weeks)
+  - Immunomodulators (azathioprine, 6-mercaptopurine, or methotrexate for ≥ 12 weeks)
+- For biologic-naive patients: Stelara may be approved if conventional therapy has failed
+- For TNF-exposed patients: Stelara is appropriate if patient failed adalimumab or infliximab
+
+2.3 DOCUMENTATION REQUIREMENTS
+1. Confirmed diagnosis with appropriate ICD-10 code
+2. Dermatologist/gastroenterologist/rheumatologist attestation
+3. BSA percentage for psoriasis OR CDAI score for Crohn's disease
+4. Documentation of all prior therapy trials with dates, doses, and reason for discontinuation
+5. TB screening (QuantiFERON or PPD) within 12 months prior to initiation
+6. Hepatitis B surface antigen and core antibody testing
+
+================================================================================
+SECTION 3: DOSING FOR PRIOR AUTHORIZATION
+================================================================================
+
+Plaque Psoriasis / Psoriatic Arthritis:
+- ≤ 100 kg: 45 mg SC at weeks 0, 4, then every 12 weeks
+- > 100 kg: 90 mg SC at weeks 0, 4, then every 12 weeks
+
+Crohn's Disease / Ulcerative Colitis:
+- IV induction dose (weight-based):
+  - ≤ 55 kg: 260 mg IV
+  - 55–85 kg: 390 mg IV
+  - > 85 kg: 520 mg IV
+- Maintenance: 90 mg SC every 8 weeks starting week 8
+
+================================================================================
+SECTION 4: RENEWAL CRITERIA
+================================================================================
+
+- Maintained clinical response: BSA improvement ≥ 50% from baseline for psoriasis, OR CDAI reduction ≥ 100 for Crohn's
+- No serious adverse events attributable to Stelara (infections, malignancies, RPLS)
+- Annual TB re-screening
+
+================================================================================
+SECTION 5: BIOSIMILAR POLICY
+================================================================================
+
+Cigna acknowledges FDA-approved biosimilar ustekinumab products. Per Cigna's
+biosimilar substitution policy, biosimilar alternatives must be considered and
+documented as unavailable or clinically inappropriate before brand Stelara is approved.
+Covered biosimilars include: Wezlana (ustekinumab-auub), Otezyla (ustekinumab-aauz).

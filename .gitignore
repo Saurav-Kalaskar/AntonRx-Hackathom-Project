@@ -1,0 +1,33 @@
+# Environment secrets
+.env
+*.env
+!.env.example
+
+# macOS / editor
+.DS_Store
+.vscode/
+.idea/
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.venv/
+venv/
+backend/venv/
+
+# Local runtime files
+*.sqlite3
+*.db
+history.db
+backend/history.db
+
+# Model/index/cache artifacts
+fastembed_cache/
+backend/fastembed_cache/
+backend/pipeline/dlq.jsonl
+
+# External references and generated assets
+stitch-skills-main/

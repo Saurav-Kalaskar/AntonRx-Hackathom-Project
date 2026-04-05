@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Time-to-Therapy | Copilot</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #bcc9c8; border-radius: 10px; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#d5e3fc",
+                    "inverse-on-surface": "#eff1f3",
+                    "tertiary-container": "#a36700",
+                    "primary-fixed-dim": "#4fdbc8",
+                    "on-tertiary-fixed": "#2a1700",
+                    "outline": "#6d7979",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "surface-container-highest": "#e0e3e5",
+                    "surface-bright": "#f7f9fb",
+                    "surface": "#f7f9fb",
+                    "on-primary-fixed-variant": "#005048",
+                    "background": "#f7f9fb",
+                    "surface-container-low": "#f2f4f6",
+                    "on-secondary-container": "#57657a",
+                    "secondary-fixed": "#d5e3fc",
+                    "primary-fixed": "#71f8e4",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#00201c",
+                    "surface-variant": "#e0e3e5",
+                    "secondary": "#515f74",
+                    "on-surface-variant": "#3d4949",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "surface-tint": "#006b5f",
+                    "surface-container-lowest": "#ffffff",
+                    "primary-container": "#008376",
+                    "primary": "#00685d",
+                    "inverse-surface": "#2d3133",
+                    "secondary-fixed-dim": "#b9c7df",
+                    "on-secondary-fixed-variant": "#3a485b",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#825100",
+                    "surface-dim": "#d8dadc",
+                    "on-primary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "on-surface": "#191c1e",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-background": "#191c1e",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#4fdbc8",
+                    "surface-container": "#eceef0",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary-fixed": "#0d1c2e",
+                    "on-primary-container": "#f4fffb",
+                    "outline-variant": "#bcc9c8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "1rem",
+                    "xl": "1.25rem",
+                    "full": "9999px"
+            }
+          },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface antialiased pb-24">
+<!-- TopAppBar -->
+<header class="bg-[#f7f9fb] dark:bg-slate-950 w-full top-0 sticky z-40 transition-colors">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="Clinician" class="w-full h-full object-cover" data-alt="Close-up professional portrait of a medical clinician wearing a white coat with a soft focused hospital background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_kLJcVF6GqExkj9EdGuPsDKsklpd1Rwas6rMk0bpdbTxtp8Qi58vEaw2qdke998f03M5hm893M-G9ktA-rthRqUbChL9bWP_WcO-pnJTtGIEl723P_yrqDa0hywU-j3eu1pO3g2YeHR_CFYteAhvr9bPuGRJEc6623HwggMmddovVAUp1jdR4QFplTVoEMRKc2McVujPXXNQHoG5jxSzhBZFeBEq-zLDPjH75h8XlDK4zH4hyfvbh873qPFHpA2DF9TBGRSwH5yXA"/>
+</div>
+<h1 class="font-manrope font-bold text-2xl tracking-tight text-teal-900 dark:text-teal-100">Time-to-Therapy</h1>
+</div>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-slate-500 hover:bg-slate-200/50 p-2 rounded-full transition-colors cursor-pointer" data-icon="settings">settings</span>
+</div>
+</div>
+<!-- Sub-nav for Matrix/Copilot -->
+<div class="flex px-6 border-b border-outline-variant/15 gap-8">
+<a href="/matrix" class="pb-3 text-sm font-semibold text-slate-400 hover:text-teal-700 transition-colors">Matrix</a>
+<a href="/copilot" class="pb-3 text-sm font-bold text-teal-800 border-b-2 border-teal-800">Copilot</a>
+</div>
+</header>
+<main class="px-4 py-6 space-y-6">
+<!-- Context Section: Patient & Policy Context -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0_4px_20px_rgba(25,28,30,0.04)] p-5 border border-outline-variant/10">
+<div class="flex justify-between items-start mb-4">
+<h2 class="font-headline font-bold text-lg text-teal-900">Patient &amp; Policy Context</h2>
+<span class="bg-primary/10 text-primary text-[10px] px-2 py-1 rounded-full font-bold uppercase tracking-wider">Active Case</span>
+</div>
+<div class="grid grid-cols-2 gap-4 mb-5" id="context-form">
+<div>
+<label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Patient Name</label>
+<input type="text" id="patient-name-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" value="Jane Doe">
+</div>
+<div>
+<label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Diagnosis / Indication</label>
+<input type="text" id="diagnosis-input" class="w-full text-sm font-semibold text-on-surface bg-surface-container-low border border-outline-variant/20 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-shadow" value="Non-Small Cell Lung Cancer (C34.9)">
+</div>
+<div>
+<label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Target Payer</label>
+<input type="text" id="payer-input" class="w-full text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-100 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/40 transition-shadow" value="Aetna">
+</div>
+<div>
+<label class="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mb-1 block">Target Drug / Medication</label>
+<input type="text" id="drug-input" class="w-full text-sm font-semibold text-teal-700 bg-teal-50 border border-teal-100 rounded px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-teal-500/40 transition-shadow" value="Keytruda">
+</div>
+</div>
+<div class="space-y-2">
+<p class="text-[11px] font-bold text-slate-500 mb-2">Coverage Clauses Found:</p>
+<div class="bg-surface-container-low p-3 rounded-lg space-y-2 border-l-4 border-primary/40" id="coverage-clauses">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-sm mt-0.5" data-icon="search">search</span>
+<p class="text-xs text-on-surface-variant leading-relaxed italic">Awaiting AI analysis...</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Warnings Section -->
+<div class="bg-tertiary-container/10 border border-tertiary-container/20 rounded-xl p-4 flex gap-3 items-start">
+<span class="material-symbols-outlined text-tertiary mt-0.5" data-icon="warning" data-weight="fill" style="font-variation-settings: 'FILL' 1;">warning</span>
+<div>
+<h3 id="warning-title" class="text-sm font-bold text-on-tertiary-fixed-variant mb-1">Policy Check Pending</h3>
+<p id="warning-text" class="text-xs text-on-tertiary-fixed-variant leading-relaxed opacity-90">Generate a draft to evaluate step-therapy and policy blockers from indexed payer documents.</p>
+</div>
+</div>
+<!-- Conversational UI -->
+<section class="space-y-4">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined text-teal-600" data-icon="psychiatry">psychiatry</span>
+<h2 class="font-headline font-bold text-teal-900">Nemotron-3-Super-120B</h2>
+</div>
+<div id="chat-container" class="space-y-4 max-h-[400px] overflow-y-auto pr-1">
+<!-- Welcome Message -->
+<div class="flex justify-start">
+<div class="bg-surface-container-highest/50 backdrop-blur-sm rounded-2xl rounded-tl-none px-4 py-3 max-w-[85%] text-sm text-on-surface-variant shadow-sm border border-outline-variant/10">
+Hello Clinician! I am the Time-to-Therapy AI. Update the patient context above and ask me to generate a Prior Authorization (PA) draft.
+</div>
+</div>
+</div>
+<!-- Input Placeholder -->
+<div class="relative mt-2">
+<input id="copilot-input" class="w-full bg-surface-container-highest border-none rounded-xl px-5 py-4 text-sm focus:ring-2 focus:ring-primary/40 focus:bg-white transition-all" placeholder="Ask Copilot anything..." type="text"/>
+<button id="send-button" class="absolute right-3 top-1/2 -translate-y-1/2 bg-primary text-on-primary p-2 rounded-lg">
+<span class="material-symbols-outlined text-base" data-icon="send">send</span>
+</button>
+</div>
+</section>
+<!-- Draft Result -->
+<section class="bg-surface-container-lowest rounded-xl border border-outline-variant/15 overflow-hidden">
+<div class="bg-surface-container-low px-5 py-3 flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-teal-700" data-icon="edit_note">edit_note</span>
+<h2 class="text-xs font-bold text-slate-600 uppercase tracking-widest">PA Draft Letter</h2>
+</div>
+<button class="text-primary text-xs font-bold hover:underline">Edit</button>
+</div>
+<div class="p-6">
+<div id="draft-result-area" class="font-serif text-[13px] text-on-surface-variant leading-relaxed space-y-4 p-4 bg-surface-bright rounded-lg border-dash border-2 border-outline-variant/20 whitespace-pre-wrap">
+<p class="italic text-slate-400">Your generated Prior Authorization letter will appear here...</p>
+</div>
+</div>
+</section>
+<!-- Action Bar -->
+<div class="flex gap-3">
+<button class="flex-1 bg-gradient-to-br from-primary to-primary-container text-on-primary font-bold py-4 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="picture_as_pdf">picture_as_pdf</span>
+                Export PDF/CSV
+            </button>
+<button class="bg-secondary-container text-on-secondary-container p-4 rounded-xl active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-safe bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl z-50 border-t border-[#bcc9c8]/15 shadow-[0_-4px_20px_rgba(25,28,30,0.04)]">
+<!-- Matrix -->
+<a href="/matrix" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-teal-600 transition-colors">
+<span class="material-symbols-outlined mb-1" data-icon="grid_view">grid_view</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider">Matrix</span>
+</a>
+<!-- Chat AI (ACTIVE) -->
+<a href="/copilot" class="flex flex-col items-center justify-center bg-teal-50 dark:bg-teal-900/30 text-teal-900 dark:text-teal-100 rounded-xl px-5 py-2 scale-95 duration-200 ease-in-out">
+<span class="material-symbols-outlined mb-1" data-icon="psychiatry" data-weight="fill" style="font-variation-settings: 'FILL' 1;">psychiatry</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider">Copilot</span>
+</a>
+<!-- History -->
+<a href="/history" class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 px-5 py-2 hover:text-teal-600 transition-colors">
+<span class="material-symbols-outlined mb-1" data-icon="history">history</span>
+<span class="font-inter text-[11px] font-semibold uppercase tracking-wider">History</span>
+</a>
+    </nav>
+
+    <style>
+        .animate-ping-slow { animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+    </style>
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const copilotInput = document.getElementById('copilot-input');
+        const sendButton = document.getElementById('send-button');
+        const draftResultArea = document.getElementById('draft-result-area');
+        const coverageClauses = document.getElementById('coverage-clauses');
+        
+        const patientNameInput = document.getElementById('patient-name-input');
+        const diagnosisInput = document.getElementById('diagnosis-input');
+        const payerInput = document.getElementById('payer-input');
+        const drugInput = document.getElementById('drug-input');
+        const warningTitle = document.getElementById('warning-title');
+        const warningText = document.getElementById('warning-text');
+
+        const queryParams = new URLSearchParams(window.location.search);
+        if (queryParams.get('payer')) payerInput.value = queryParams.get('payer');
+        if (queryParams.get('medication')) drugInput.value = queryParams.get('medication');
+        if (queryParams.get('diagnosis')) diagnosisInput.value = queryParams.get('diagnosis');
+
+        function appendUserMessage(text) {
+            const el = document.createElement('div');
+            el.className = "flex justify-end";
+            el.innerHTML = `<div class="bg-primary text-on-primary rounded-2xl rounded-tr-none px-4 py-3 max-w-[85%] text-sm shadow-sm">${text}</div>`;
+            chatContainer.appendChild(el);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function appendAIMessage(text, id = null) {
+            const el = document.createElement('div');
+            el.className = "flex justify-start";
+            if (id) el.id = id;
+            el.innerHTML = `<div class="bg-surface-container-highest/50 backdrop-blur-sm rounded-2xl rounded-tl-none px-4 py-3 max-w-[85%] text-sm text-on-surface-variant shadow-sm border border-outline-variant/10">${text}</div>`;
+            chatContainer.appendChild(el);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        sendButton.addEventListener('click', async () => {
+            const val = copilotInput.value.trim();
+            if (!val) return;
+
+            appendUserMessage(val);
+            copilotInput.value = "";
+            sendButton.disabled = true;
+            
+            const thinkingId = 'ai-thinking-' + Date.now();
+            appendAIMessage(`<div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-primary animate-ping-slow"></div><span>Querying RAG vectors &amp; drafting PA letter with Nemotron-120B...</span></div>`, thinkingId);
+            
+            draftResultArea.innerHTML = '<p class="italic text-slate-400 animate-pulse">Generating draft using Nvidia Nemotron-3-Super-120B... This may take 15-30 seconds.</p>';
+
+            try {
+                const requestPayload = {
+                    payer_name: payerInput.value.trim() || "Aetna",
+                    patient_context: {
+                        patient_name: patientNameInput.value.trim() || "Jane Doe",
+                        diagnosis: diagnosisInput.value.trim() || "Non-Small Cell Lung Cancer (C34.9)",
+                        medication: drugInput.value.trim() || "Keytruda"
+                    }
+                };
+
+                const res = await fetch("/draft", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestPayload)
+                });
+                
+                const data = await res.json();
+                
+                const thinkingEl = document.getElementById(thinkingId);
+                if (thinkingEl) thinkingEl.remove();
+                sendButton.disabled = false;
+
+                if (res.ok && data.draft) {
+                    // Clean markdown artifacts and render with line break preservation
+                    let rawDraft = data.draft.replace(/```[a-z]*\n?/g, '').replace(/```/g, '').trim();
+                    let formattedDraft = rawDraft.replace(/\n/g, '<br>');
+                    
+                    draftResultArea.innerHTML = `<div id="exportable-draft" class="text-[13px] leading-relaxed text-on-surface-variant bg-surface-bright rounded-lg font-serif">${formattedDraft}</div>`;
+                    appendAIMessage(`✅ PA draft complete for <strong>${requestPayload.patient_context.patient_name}</strong> — ${requestPayload.payer_name}. Review the letter below.`);
+                    
+                    // Display REAL retrieved policy clauses from backend
+                    const rules = data.retrieved_rules || [];
+                    if (rules.length > 0) {
+                        const hasStepRequirement = rules.some((rule) => (rule.text || '').toLowerCase().includes('step'));
+                        warningTitle.textContent = hasStepRequirement ? 'Step Therapy Signal Detected' : 'No Immediate Step-Therapy Blocker';
+                        warningText.textContent = hasStepRequirement
+                            ? 'Retrieved payer clauses include explicit step-therapy requirements. Review criteria before submission.'
+                            : 'Retrieved policy clauses do not show mandatory step-therapy language for this request.';
+
+                        coverageClauses.innerHTML = rules.map((r, i) => `
+                            <div class="flex items-start gap-2 mb-2">
+                                <span class="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                                <div>
+                                    <p class="text-[10px] font-bold text-primary uppercase tracking-wider mb-0.5">Clause ${i+1} | ${r.citation || r.source || 'Policy Document'} | Score: ${r.score ? (r.score*100).toFixed(0)+'%' : 'N/A'}</p>
+                                    <p class="text-xs text-on-surface-variant leading-relaxed italic">&ldquo;${(r.text || '').substring(0, 200)}${r.text && r.text.length > 200 ? '...' : ''}&rdquo;</p>
+                                    ${r.citation_url ? `<a href="${r.citation_url}" target="_blank" rel="noopener noreferrer" class="text-[11px] text-primary hover:underline">Open source policy</a>` : ''}
+                                </div>
+                            </div>`).join('');
+                    } else {
+                        warningTitle.textContent = 'Policy Coverage Not Found';
+                        warningText.textContent = 'No matching policy evidence exists in the current coverage index for this payer and medication.';
+                        coverageClauses.innerHTML = `<div class="flex items-start gap-2"><span class="material-symbols-outlined text-slate-400 text-sm mt-0.5">info</span><p class="text-xs text-slate-400 italic">No specific policy clauses indexed for this query. Add policy .txt files to backend/pipeline/documents/.</p></div>`;
+                    }
+
+                } else {
+                    const errMsg = data.detail || 'Unknown backend error';
+                    console.error("Backend error:", data);
+                    appendAIMessage(`❌ Backend error: ${errMsg}`);
+                    draftResultArea.innerHTML = `<p class="text-red-600 font-bold text-sm">Error: ${errMsg}</p>`;
+                }
+            } catch (err) {
+                console.error("Fetch error:", err);
+                const thinkingEl = document.getElementById(thinkingId);
+                if (thinkingEl) thinkingEl.remove();
+                sendButton.disabled = false;
+                appendAIMessage("❌ Connection error: Could not reach the backend at port 8005. Ensure the server is running.");
+                draftResultArea.innerHTML = '<p class="text-red-600 font-bold text-sm">Connection error: Backend at port 8005 is unreachable. Run: <code>cd backend && uvicorn main:app --port 8005</code></p>';
+            }
+        });
+        
+        copilotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendButton.click();
+        });
+
+        // Export to plain text (opens in new tab for user to print/save)
+        document.querySelector('[data-icon="picture_as_pdf"]')?.closest('button')?.addEventListener('click', () => {
+            const draftEl = document.getElementById('exportable-draft');
+            if (!draftEl || draftEl.children.length === 0) {
+                alert('Generate a PA draft first before exporting.');
+                return;
+            }
+            const content = draftEl.innerText;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const patient = document.getElementById('patient-name-input').value || 'Patient';
+            const payer = document.getElementById('payer-input').value || 'Payer';
+            a.download = `PA_Letter_${patient.replace(/\s+/g,'_')}_${payer}_${new Date().toISOString().split('T')[0]}.txt`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+    </script>
+</body></html>

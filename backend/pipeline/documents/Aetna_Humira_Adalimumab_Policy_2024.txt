@@ -1,0 +1,130 @@
+Aetna Rheumatology Drug Policy — Adalimumab (Humira) and Biosimilars
+Effective Date: January 2024 | Policy Number: ARD-2024-HUMIRA-004
+
+================================================================================
+SECTION 1: COVERED INDICATIONS
+================================================================================
+
+Adalimumab (Humira) and biosimilar adalimumab products are covered under Aetna's
+medical benefit and pharmacy benefit for the following conditions:
+
+- Rheumatoid Arthritis (moderate-to-severe): ICD-10 M05.x, M06.x
+- Psoriatic Arthritis: ICD-10 M07.3
+- Ankylosing Spondylitis: ICD-10 M45.x
+- Plaque Psoriasis (moderate-to-severe): ICD-10 L40.0, BSA ≥ 10%
+- Crohn's Disease (moderate-to-severe): ICD-10 K50.x
+- Ulcerative Colitis (moderate-to-severe): ICD-10 K51.x
+- Juvenile Idiopathic Arthritis: ICD-10 M08.0x, patients ≥ 2 years
+
+================================================================================
+SECTION 2: RHEUMATOID ARTHRITIS — PRIOR AUTHORIZATION CRITERIA
+================================================================================
+
+2.1 DISEASE ACTIVITY THRESHOLDS (must meet at least ONE):
+- Clinical Disease Activity Index (CDAI) > 22 (high disease activity)
+- DAS28-CRP > 5.1
+- ≥ 6 tender joints AND ≥ 6 swollen joints
+- Elevated inflammatory markers: CRP > 2x ULN or ESR > 50 mm/hr
+
+2.2 STEP THERAPY REQUIREMENTS
+Step 1 — Required Conventional DMARD Trial (minimum 3 months at therapeutic dose):
+  Primary option: Methotrexate (MTX)
+    - Must reach minimum 15 mg/week; target 20-25 mg/week
+    - Folic acid supplementation 1 mg/day required
+    - If MTX is contraindicated or not tolerated after 8+ weeks:
+      Acceptable alternatives: Leflunomide (10-20 mg/day) OR Hydroxychloroquine + Sulfasalazine combination
+
+Step 2 — Inadequate Response Documentation:
+  - Physician-attested inadequate clinical response after ≥ 12 weeks at therapeutic MTX dose
+  - OR documented intolerance: hepatotoxicity (ALT/AST > 3x ULN), cytopenias, GI intolerance unmanageable with antiemetics, pulmonary toxicity
+
+Step 3 — Qualifying for Adalimumab/Biosimilar Approval:
+  - Documented Step 1 DMARD trial completion AND failure
+  - Disease activity confirmed at screening visit
+  - No active/serious infection including TB (see Section 5)
+  - Negative pregnancy test (for women of childbearing potential)
+
+2.3 STEP THERAPY EXCEPTION — BYPASS CRITERIA
+PA may be approved for adalimumab WITHOUT DMARD step therapy if:
+- Rapid progressive erosive joint disease on X-ray within past 6 months
+- Extra-articular manifestations (serositis, vasculitis, Felty syndrome)
+- CDAI > 38 at presentation despite any oral therapy
+- Physician documents three or more failed DMARDs previously
+
+================================================================================
+SECTION 3: PLAQUE PSORIASIS — PRIOR AUTHORIZATION CRITERIA
+================================================================================
+
+3.1 SEVERITY THRESHOLD (must meet):
+- Body Surface Area (BSA) ≥ 10% OR
+- Psoriasis Area and Severity Index (PASI) score ≥ 12 OR
+- DLQI (Dermatology Life Quality Index) > 10
+- Disease involving hands, feet, face, or genitalia (even if BSA < 10%)
+
+3.2 STEP THERAPY FOR PSORIASIS
+Step 1 — Topical therapy (minimum 3 months):
+  - High-potency corticosteroid (e.g., clobetasol 0.05%) AND calcipotriene combination
+  - Plus UV phototherapy (NB-UVB or PUVA) if access available — minimum 24 sessions
+
+Step 2 — Systemic conventional therapy (minimum 12 weeks each, at therapeutic dose):
+  At least ONE of the following:
+  - Methotrexate (oral or SC, 15-25 mg/week)
+  - Cyclosporine (3-5 mg/kg/day; maximum 12-week continuous course due to nephrotoxicity)
+  - Acitretin (25-50 mg/day)
+
+Adalimumab is approved as THIRD-LINE if Steps 1 and 2 are documented failures.
+EXCEPTION: Adalimumab may be approved second-line if ALL systemic conventional therapies are contraindicated.
+
+================================================================================
+SECTION 4: DOSING AND BENEFIT ADMINISTRATION
+================================================================================
+
+Standard Dosing — Rheumatoid Arthritis:
+- 40 mg SC every other week (Q2W)
+- For inadequate response on Q2W: 40 mg SC weekly may be authorized
+
+Standard Dosing — Plaque Psoriasis:
+- Initial: 80 mg SC (Day 1)
+- 40 mg at Day 8
+- Then 40 mg SC every other week
+
+Standard Dosing — Crohn's Disease / Ulcerative Colitis:
+- Induction: 160 mg SC at Week 0 (split over 2 days), 80 mg at Week 2
+- Maintenance: 40 mg SC every other week starting Week 4
+
+Benefit Administration:
+- Aetna covers adalimumab biosimilars under both pharmacy (self-injectable) and
+  medical benefit (physician-administered) based on site of care
+- Citrate-free biosimilar formulations preferred for patient comfort
+
+================================================================================
+SECTION 5: TUBERCULOSIS AND INFECTION SCREENING REQUIREMENTS
+================================================================================
+
+MANDATORY before initiating adalimumab or biosimilar:
+
+TB Screening:
+- IGRA (QuantiFERON-TB Gold Plus) preferred; TST (Mantoux) acceptable
+- Positive IGRA/TST: Confirm with chest X-ray; initiate 9 months isoniazid prophylaxis and
+  delay adalimumab until 1 month of isoniazid completed minimum
+
+Hepatitis Screening:
+- HBsAg, anti-HBc total, anti-HBs (quantitative)
+- Active HBV: Adalimumab contraindicated; refer to hepatology for antiviral management
+- Resolved HBV (anti-HBc positive, HBsAg negative): Prophylactic antiviral (entecavir or tenofovir)
+  required during treatment and 12 months after discontinuation
+- HCV: Screen with anti-HCV antibody; active HCV is NOT an absolute contraindication but
+  requires hepatology co-management
+
+===============================================================================
+SECTION 6: RENEWAL CRITERIA (12-MONTH REVIEW)
+===============================================================================
+
+Clinical response must be documented at each renewal using standardized scales:
+- RA: CDAI ≤ 10 (low disease activity) or ≥ 50% reduction from baseline
+- Psoriasis: PASI improvement ≥ 75% (PASI 75) from baseline OR BSA < 3%
+- Crohn's: CDAI < 150 (remission) or ≥ 100-point reduction from baseline
+- UC: Mayo score ≤ 2 (remission) or partial Mayo score reduction ≥ 3 points
+
+Failure to demonstrate clinical response at 6-month review (for RA) or annual review
+will result in non-renewal. Physician may appeal with clinical justification.

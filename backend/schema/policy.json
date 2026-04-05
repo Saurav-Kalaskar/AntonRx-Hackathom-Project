@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Medical Benefit Drug Policy",
+  "type": "object",
+  "properties": {
+    "drug_name": {
+      "type": "string",
+      "description": "The name of the drug being evaluated"
+    },
+    "drug_category": {
+      "type": "string",
+      "description": "The therapeutic class or drug category"
+    },
+    "access_status": {
+      "type": "string",
+      "enum": ["Preferred", "Non-Preferred"],
+      "description": "The formulaic access status"
+    },
+    "covered_indications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of approved medical indications for coverage"
+    },
+    "pa_requirements": {
+      "type": "string",
+      "description": "Detailed prior authorization (PA) criteria requirements"
+    },
+    "step_therapy_requirements": {
+      "type": "string",
+      "description": "Step therapy or prerequisite drug requirements before approval"
+    },
+    "site_of_care_restrictions": {
+      "type": "string",
+      "description": "Restrictions on where the drug can be administered (e.g. physician office vs hospital)"
+    },
+    "dosing_limits": {
+      "type": "string",
+      "description": "Maximum dosing, frequency, or quantity limits allowed"
+    },
+    "effective_dates": {
+      "type": "string",
+      "description": "Policy effective dates and review cycles"
+    }
+  },
+  "required": [
+    "drug_name",
+    "drug_category",
+    "access_status",
+    "covered_indications",
+    "pa_requirements",
+    "step_therapy_requirements",
+    "site_of_care_restrictions",
+    "dosing_limits",
+    "effective_dates"
+  ],
+  "additionalProperties": false
+}
