@@ -697,6 +697,57 @@ async def oncology_search(drug: str = "", _user: Dict[str, Any] | None = Depends
     }
 
 
+@app.get("/api/draft/test-cases")
+async def get_draft_test_cases(
+    payer: str = "",
+    medication: str = "",
+    _user: Dict[str, Any] | None = Depends(require_auth),
+):
+    payer_filter = (payer or "").strip().lower()
+    medication_filter = (medication or "").strip().lower()
+
+    seen = set()
+    cases: List[Dict[str, Any]] = []
+
+    for policy in rag_engine.policy_records:
+        policy_payer = policy.get("payer", "Unknown")
+        policy_med = policy.get("drug_name", "Unknown Drug")
+
+        if payer_filter and payer_filter not in policy_payer.lower():
+            continue
+        if medication_filter and medication_filter not in policy_med.lower():
+            continue
+
+        indications = policy.get("covered_indications") or ["General policy criteria"]
+        diagnosis = indications[0] if indications else "General policy criteria"
+
+        key = (policy_payer.lower(), policy_med.lower(), diagnosis.lower())
+        if key in seen:
+            continue
+        seen.add(key)
+
+        cases.append(
+            {
+                "payer_name": policy_payer,
+                "patient_context": {
+                    "patient_name": "Demo Patient",
+                    "diagnosis": diagnosis,
+                    "medication": policy_med,
+                },
+                "drug_category": policy.get("drug_category", "Specialty"),
+                "source": policy.get("source"),
+                "source_url": f"/policies/{policy.get('source')}" if policy.get("source") else None,
+            }
+        )
+
+    cases.sort(key=lambda item: (item["payer_name"], item["patient_context"]["medication"]))
+
+    return {
+        "total": len(cases),
+        "cases": cases,
+    }
+
+
 if __name__ == "__main__":
     import uvicorn
     # Print registered routes for debugging
