@@ -116,8 +116,40 @@
     });
   }
 
+  async function establishBackendSession() {
+    if (!authState.client) return;
+
+    const token = await authState.client.getTokenSilently({
+      authorizationParams: { audience: authState.audience },
+    });
+
+    const response = await fetch("/auth/session", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to establish app session: HTTP ${response.status}`);
+    }
+  }
+
+  async function clearBackendSession() {
+    try {
+      await fetch("/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } catch (_) {
+      // Ignore network failures while logging out.
+    }
+  }
+
   async function logout() {
     if (!authState.client) return;
+    await clearBackendSession();
     const returnTo = `${window.location.origin}${authState.logoutReturnPath || LOGIN_PATH}`;
     await authState.client.logout({ logoutParams: { returnTo } });
   }
@@ -193,10 +225,16 @@
     if (hasAuthCallback) {
       const result = await authState.client.handleRedirectCallback();
       const returnTo = result.appState && result.appState.returnTo ? result.appState.returnTo : "/matrix";
-      window.history.replaceState({}, document.title, returnTo);
+      await establishBackendSession();
+      window.location.replace(returnTo);
+      return;
     }
 
     const authenticated = await authState.client.isAuthenticated();
+
+    if (authenticated) {
+      await establishBackendSession();
+    }
 
     if (window.location.pathname === LOGIN_PATH) {
       if (authenticated) {

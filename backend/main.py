@@ -23,24 +23,40 @@ os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "0"
 os.environ["HF_HUB_DISABLE_FAST_DOWNLOAD"] = "1"
 # ─────────────────────────────────────────────────────────────────────────────
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse, JSONResponse
 from pydantic import BaseModel
 from typing import List, Dict, Any
 
 try:
     from .generator.drafter import PADrafter
     from .pipeline.rag_engine import RAGEngine
-    from .auth import require_auth, get_auth_public_config, get_auth_settings
+    from .auth import (
+        require_auth,
+        get_auth_public_config,
+        get_auth_settings,
+        has_valid_app_session,
+        issue_app_session_token,
+        set_app_session_cookie,
+        clear_app_session_cookie,
+    )
 except ImportError as exc:
     if "attempted relative import with no known parent package" not in str(exc):
         raise
     # Fallback for running this file directly from backend/.
     from generator.drafter import PADrafter
     from pipeline.rag_engine import RAGEngine
-    from auth import require_auth, get_auth_public_config, get_auth_settings
+    from auth import (
+        require_auth,
+        get_auth_public_config,
+        get_auth_settings,
+        has_valid_app_session,
+        issue_app_session_token,
+        set_app_session_cookie,
+        clear_app_session_cookie,
+    )
 
 app = FastAPI(
     title="Time-to-Therapy API",
@@ -71,6 +87,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def protect_static_html_routes(request: Request, call_next):
+    settings = get_auth_settings()
+    path = request.url.path.lower()
+    if settings.get("enabled") and path.startswith("/static/") and path.endswith(".html"):
+        if not has_valid_app_session(request):
+            return RedirectResponse(url="/login")
+    return await call_next(request)
 
 # ── Singleton RAG Engine (initializes on startup) ────────────────────────────
 rag_engine = RAGEngine()
@@ -219,7 +245,10 @@ async def index():
 
 
 @app.get("/login", include_in_schema=False)
-async def login_page():
+async def login_page(request: Request):
+    auth_settings = get_auth_settings()
+    if auth_settings.get("enabled") and has_valid_app_session(request):
+        return RedirectResponse(url="/matrix")
     return FileResponse(os.path.join(frontend_dir, "login.html"))
 
 
@@ -229,23 +258,54 @@ async def auth_callback_page():
 
 
 @app.get("/matrix", include_in_schema=False)
-async def matrix_page():
+async def matrix_page(request: Request):
+    auth_settings = get_auth_settings()
+    if auth_settings.get("enabled") and not has_valid_app_session(request):
+        return RedirectResponse(url="/login")
     return FileResponse(os.path.join(frontend_dir, "matrix.html"))
 
 
 @app.get("/copilot", include_in_schema=False)
-async def copilot_page():
+async def copilot_page(request: Request):
+    auth_settings = get_auth_settings()
+    if auth_settings.get("enabled") and not has_valid_app_session(request):
+        return RedirectResponse(url="/login")
     return FileResponse(os.path.join(frontend_dir, "copilot.html"))
 
 
 @app.get("/history", include_in_schema=False)
-async def history_page():
+async def history_page(request: Request):
+    auth_settings = get_auth_settings()
+    if auth_settings.get("enabled") and not has_valid_app_session(request):
+        return RedirectResponse(url="/login")
     return FileResponse(os.path.join(frontend_dir, "history.html"))
 
 
 @app.get("/auth/config")
 async def auth_config():
     return get_auth_public_config()
+
+
+@app.post("/auth/session")
+async def create_auth_session(_user: Dict[str, Any] | None = Depends(require_auth)):
+    settings = get_auth_settings()
+    if not settings.get("enabled"):
+        return {"status": "auth-disabled"}
+
+    if not _user:
+        raise HTTPException(status_code=401, detail="Missing authenticated user.")
+
+    session_token = issue_app_session_token(_user, settings)
+    response = JSONResponse({"status": "ok"})
+    set_app_session_cookie(response, session_token)
+    return response
+
+
+@app.post("/auth/logout")
+async def clear_auth_session():
+    response = JSONResponse({"status": "ok"})
+    clear_app_session_cookie(response)
+    return response
 
 
 # ── Endpoints ─────────────────────────────────────────────────────────────────

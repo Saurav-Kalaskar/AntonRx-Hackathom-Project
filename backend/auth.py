@@ -4,10 +4,12 @@ import time
 from typing import Any, Dict, Optional
 
 import httpx
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, Request, Response, status
 
 _JWKS_CACHE: Dict[str, Any] = {"domain": None, "fetched_at": 0.0, "jwks": None}
 _JWKS_TTL_SECONDS = 3600
+SESSION_COOKIE_NAME = "ttt_session"
+DEFAULT_SESSION_TTL_SECONDS = 60 * 60 * 8
 
 
 def _env_bool(name: str, default: bool = False) -> bool:
@@ -55,6 +57,111 @@ def get_auth_public_config() -> Dict[str, Any]:
         "callbackPath": settings["callback_path"],
         "logoutReturnPath": settings["logout_return_path"],
     }
+
+
+def _get_session_ttl_seconds() -> int:
+    raw = (os.getenv("SESSION_TTL_SECONDS") or "").strip()
+    if not raw:
+        return DEFAULT_SESSION_TTL_SECONDS
+    try:
+        value = int(raw)
+        return max(300, value)
+    except ValueError:
+        return DEFAULT_SESSION_TTL_SECONDS
+
+
+def _get_session_secret(settings: Dict[str, Any]) -> str:
+    explicit = (os.getenv("APP_SESSION_SECRET") or "").strip()
+    if explicit:
+        return explicit
+
+    # Deterministic fallback so environments without explicit secret still work.
+    # For production, APP_SESSION_SECRET should always be set.
+    base = f"{settings.get('domain', '')}|{settings.get('client_id', '')}|time-to-therapy"
+    if base.replace("|", "").strip():
+        return base
+
+    return "time-to-therapy-dev-session-secret"
+
+
+def issue_app_session_token(user_claims: Dict[str, Any], settings: Dict[str, Any]) -> str:
+    try:
+        import jwt
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Session token dependency missing: {exc}",
+        )
+
+    now = int(time.time())
+    ttl_seconds = _get_session_ttl_seconds()
+
+    payload = {
+        "sub": user_claims.get("sub", "unknown"),
+        "email": user_claims.get("email"),
+        "aud": settings.get("audience", ""),
+        "iat": now,
+        "exp": now + ttl_seconds,
+        "iss": "time-to-therapy-app",
+    }
+
+    token = jwt.encode(payload, _get_session_secret(settings), algorithm="HS256")
+    return token
+
+
+def verify_app_session_token(session_token: str, settings: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+    try:
+        import jwt
+        from jwt.exceptions import InvalidTokenError
+    except Exception:
+        return None
+
+    if not session_token:
+        return None
+
+    try:
+        payload = jwt.decode(
+            session_token,
+            _get_session_secret(settings),
+            algorithms=["HS256"],
+            options={"verify_aud": False},
+        )
+        return payload
+    except InvalidTokenError:
+        return None
+    except Exception:
+        return None
+
+
+def has_valid_app_session(request: Request) -> bool:
+    settings = get_auth_settings()
+    if not settings.get("enabled"):
+        return True
+
+    token = request.cookies.get(SESSION_COOKIE_NAME) or ""
+    payload = verify_app_session_token(token, settings)
+    if not payload:
+        return False
+
+    request.state.user = payload
+    return True
+
+
+def set_app_session_cookie(response: Response, session_token: str) -> None:
+    secure_cookie = _env_bool("SESSION_COOKIE_SECURE", False)
+    response.set_cookie(
+        key=SESSION_COOKIE_NAME,
+        value=session_token,
+        httponly=True,
+        secure=secure_cookie,
+        samesite="lax",
+        max_age=_get_session_ttl_seconds(),
+        path="/",
+    )
+
+
+def clear_app_session_cookie(response: Response) -> None:
+    response.delete_cookie(key=SESSION_COOKIE_NAME, path="/")
 
 
 async def _fetch_jwks(domain: str) -> Dict[str, Any]:
