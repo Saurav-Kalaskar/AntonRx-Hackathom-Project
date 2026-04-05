@@ -46,6 +46,83 @@ The application combines three capabilities in one workflow:
 - `PADrafter` in `backend/generator/drafter.py`
 - API routes in `backend/main.py`
 
+## Architecture Diagrams
+### High-Level Architecture
+```mermaid
+flowchart LR
+  Clinician[Clinician User]
+  Frontend[Frontend Web UI\nMatrix | Copilot | History]
+  Backend[Backend API Layer\nFastAPI]
+  VectorDB[(Vector DB\nQdrant In-Memory Index)]
+  AppDB[(Application DB\nSQLite History)]
+  PolicyDocs[(Policy Corpus\nDocument Files)]
+  LLM[LLM Inference Service\nNVIDIA NIM]
+
+  Clinician --> Frontend
+  Frontend --> Backend
+  Backend --> VectorDB
+  Backend --> AppDB
+  Backend --> PolicyDocs
+  Backend --> LLM
+  Backend --> Frontend
+```
+
+### Low-Level Architecture
+```mermaid
+flowchart TB
+  subgraph FrontendLayer[Frontend Layer]
+    MatrixPage[matrix.html\nCoverage comparison]
+    CopilotPage[copilot.html\nPA drafting workflow]
+    HistoryPage[history.html\nDraft history review]
+  end
+
+  subgraph APILayer[Backend API Layer - backend/main.py]
+    HealthAPI[GET /health]
+    MatrixAPI[GET /api/matrix\nGET /api/matrix/compare\nGET /api/matrix/categories]
+    DraftAPI[POST /draft]
+    HistoryAPI[GET /api/history]
+    PolicyFileAPI[GET /policies/:filename]
+  end
+
+  subgraph ServiceLayer[Service Layer]
+    RAG[RAGEngine\nbackend/pipeline/rag_engine.py]
+    Drafter[PADrafter\nbackend/generator/drafter.py]
+    Env[env_loader.py]
+  end
+
+  subgraph DataLayer[Data Layer]
+    PolicyFiles[(backend/pipeline/documents)]
+    Schema[(backend/schema/policy.json)]
+    DLQ[(backend/pipeline/dlq.jsonl)]
+    VectorIndex[(Qdrant Vector Index)]
+    DraftHistory[(backend/history.db)]
+  end
+
+  subgraph ExternalLayer[External Dependency]
+    Nemotron[NVIDIA Nemotron\nOpenAI-Compatible Endpoint]
+  end
+
+  MatrixPage --> MatrixAPI
+  CopilotPage --> DraftAPI
+  CopilotPage --> MatrixAPI
+  HistoryPage --> HistoryAPI
+
+  HealthAPI --> RAG
+  MatrixAPI --> RAG
+  DraftAPI --> RAG
+  DraftAPI --> Drafter
+  DraftAPI --> DraftHistory
+  HistoryAPI --> DraftHistory
+  PolicyFileAPI --> PolicyFiles
+
+  RAG --> PolicyFiles
+  RAG --> Schema
+  RAG --> DLQ
+  RAG --> VectorIndex
+  Drafter --> Nemotron
+  Env --> APILayer
+```
+
 ## Data: What It Is and Where It Is Accessed
 ### Source Policy Data
 Policy documents are loaded from:
@@ -89,7 +166,7 @@ Create a root `.env` file (already supported by project env loader):
 ```env
 NVIDIA_API_KEY=your_key_here
 STRICT_LLM_MODE=true
-ALLOWED_ORIGINS=http://localhost:8005,http://127.0.0.1:8005
+ALLOWED_ORIGINS=https://frontend-app.example
 ```
 
 Notes:
@@ -107,10 +184,10 @@ python -m pip install -r backend/aws_deployment_config/requirements.txt
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 8005
 ```
 
-3. Open in browser:
-- `http://127.0.0.1:8005/matrix`
-- `http://127.0.0.1:8005/copilot`
-- `http://127.0.0.1:8005/history`
+3. Access frontend routes served by backend:
+- Frontend route: `/matrix`
+- Frontend route: `/copilot`
+- Frontend route: `/history`
 
 ## QA and Verification
 Run automated smoke tests:
