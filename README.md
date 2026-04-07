@@ -209,6 +209,10 @@ python -m uvicorn backend.main:app --host 0.0.0.0 --port 8005
 - Frontend route: `/copilot`
 - Frontend route: `/history`
 
+## Production Deploy (Public URL)
+- Recommended path for this architecture: Google Cloud Run.
+- Step-by-step instructions: `DEPLOY_GCP_CLOUD_RUN.md`
+
 ## QA and Verification
 Run automated smoke tests:
 
