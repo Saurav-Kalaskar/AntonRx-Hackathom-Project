@@ -53,6 +53,80 @@ Time-to-Therapy reduces that cycle by:
 - Frontend: HTML, Tailwind CDN, vanilla JavaScript
 - Runtime packaging: Docker
 
+## Architecture Diagrams
+
+### High-Level Architecture
+```mermaid
+flowchart LR
+  User[Clinician User] --> UI[Web UI\n/login /matrix /copilot /history]
+  UI --> API[FastAPI Backend\nGoogle Cloud Run]
+  API --> RAG[RAG Engine\nQdrant In-Memory Vector DB]
+  API --> LLM[NVIDIA Nemotron LLM API]
+  API --> DB[SQLite\nDraft + User Data]
+  RAG --> Docs[Policy Documents\nTXT/PDF Corpus]
+```
+
+### Low-Level Architecture
+```mermaid
+flowchart TB
+  subgraph Frontend[Frontend Layer - site/public]
+    Login[login.html]
+    Matrix[matrix.html]
+    Copilot[copilot.html]
+    History[history.html]
+    AuthJS[auth.js]
+  end
+
+  subgraph Backend[API Layer - backend/main.py]
+    AuthRoutes[/auth/config /auth/me /auth/login /auth/register /auth/session /auth/logout]
+    PageRoutes[/ /login /matrix /copilot /history]
+    MatrixRoutes[/api/matrix /api/matrix/categories /api/matrix/compare]
+    DraftRoutes[/draft /api/draft/test-cases]
+    HistoryRoute[/api/history]
+    SearchRoute[/api/oncology-search]
+    Health[/health]
+  end
+
+  subgraph Services[Service Layer]
+    RAGSvc[RAGEngine\nbackend/pipeline/rag_engine.py]
+    Drafter[PADrafter\nbackend/generator/drafter.py]
+    AuthSvc[Session/Auth\nbackend/auth.py]
+  end
+
+  subgraph Data[Data Layer]
+    PolicyFiles[backend/pipeline/documents]
+    Schema[backend/schema/policy.json]
+    DLQ[backend/pipeline/dlq.jsonl]
+    Qdrant[(Qdrant In-Memory Index)]
+    SQLite[(backend/history.db)]
+  end
+
+  Login --> AuthJS
+  Matrix --> AuthJS
+  Copilot --> AuthJS
+  History --> AuthJS
+
+  Login --> AuthRoutes
+  Matrix --> MatrixRoutes
+  Copilot --> DraftRoutes
+  History --> HistoryRoute
+
+  AuthRoutes --> AuthSvc
+  MatrixRoutes --> RAGSvc
+  DraftRoutes --> RAGSvc
+  DraftRoutes --> Drafter
+  DraftRoutes --> SQLite
+  HistoryRoute --> SQLite
+  SearchRoute --> RAGSvc
+  Health --> RAGSvc
+
+  RAGSvc --> PolicyFiles
+  RAGSvc --> Schema
+  RAGSvc --> DLQ
+  RAGSvc --> Qdrant
+  Drafter --> LLMExt[NVIDIA API]
+```
+
 ## Repository Layout (Key Paths)
 - [backend/main.py](backend/main.py) - app entrypoint, routes, auth/session wiring
 - [backend/auth.py](backend/auth.py) - auth provider selection, token/session validation

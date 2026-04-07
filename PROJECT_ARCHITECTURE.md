@@ -27,6 +27,78 @@ The current implementation is optimized for deterministic policy retrieval and d
 - Persistence: SQLite (single file)
 - Frontend: HTML + Tailwind CDN + vanilla JS
 
+### High-level architecture diagram
+```mermaid
+flowchart LR
+  User[Clinician User] --> UI[Web UI\n/login /matrix /copilot /history]
+  UI --> API[FastAPI Service\nCloud Run Production]
+  API --> RAG[RAG Engine + Qdrant\nIn-Memory Vector Search]
+  API --> LLM[NVIDIA Nemotron API]
+  API --> DB[SQLite\nUsers + Draft History]
+  RAG --> Docs[Policy Document Corpus\nbackend/pipeline/documents]
+```
+
+### Low-level architecture diagram
+```mermaid
+flowchart TB
+  subgraph Frontend[Frontend Layer - site/public]
+    Login[login.html]
+    Matrix[matrix.html]
+    Copilot[copilot.html]
+    History[history.html]
+    AuthJS[auth.js]
+  end
+
+  subgraph API[API Layer - backend/main.py]
+    AuthEndpoints[/auth/config /auth/me /auth/login /auth/register /auth/session /auth/logout]
+    PageEndpoints[/ /login /matrix /copilot /history]
+    MatrixEndpoints[/api/matrix /api/matrix/categories /api/matrix/compare]
+    DraftEndpoints[/draft /api/draft/test-cases]
+    HistoryEndpoint[/api/history]
+    SearchEndpoint[/api/oncology-search]
+    HealthEndpoint[/health]
+  end
+
+  subgraph Services[Service Layer]
+    RAGSvc[RAGEngine\nbackend/pipeline/rag_engine.py]
+    DraftSvc[PADrafter\nbackend/generator/drafter.py]
+    AuthSvc[Auth + Session\nbackend/auth.py]
+  end
+
+  subgraph Data[Data Layer]
+    Policies[Policy Files\nbackend/pipeline/documents]
+    Schema[Policy Schema\nbackend/schema/policy.json]
+    DLQ[Dead Letter Queue\nbackend/pipeline/dlq.jsonl]
+    Qdrant[(Qdrant In-Memory)]
+    SQLite[(backend/history.db)]
+  end
+
+  Login --> AuthJS
+  Matrix --> AuthJS
+  Copilot --> AuthJS
+  History --> AuthJS
+
+  Login --> AuthEndpoints
+  Matrix --> MatrixEndpoints
+  Copilot --> DraftEndpoints
+  History --> HistoryEndpoint
+
+  AuthEndpoints --> AuthSvc
+  MatrixEndpoints --> RAGSvc
+  DraftEndpoints --> RAGSvc
+  DraftEndpoints --> DraftSvc
+  DraftEndpoints --> SQLite
+  HistoryEndpoint --> SQLite
+  SearchEndpoint --> RAGSvc
+  HealthEndpoint --> RAGSvc
+
+  RAGSvc --> Policies
+  RAGSvc --> Schema
+  RAGSvc --> DLQ
+  RAGSvc --> Qdrant
+  DraftSvc --> LLMExt[NVIDIA Endpoint]
+```
+
 ## 3. Layered Architecture
 
 ### Frontend layer
