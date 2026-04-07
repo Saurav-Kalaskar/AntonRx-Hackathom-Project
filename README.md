@@ -78,13 +78,13 @@ flowchart TB
   end
 
   subgraph Backend[API Layer - backend/main.py]
-    AuthRoutes[/auth/config /auth/me /auth/login /auth/register /auth/session /auth/logout]
-    PageRoutes[/ /login /matrix /copilot /history]
-    MatrixRoutes[/api/matrix /api/matrix/categories /api/matrix/compare]
-    DraftRoutes[/draft /api/draft/test-cases]
-    HistoryRoute[/api/history]
-    SearchRoute[/api/oncology-search]
-    Health[/health]
+    AuthRoutes["Auth Routes<br/>/auth/config<br/>/auth/me<br/>/auth/login<br/>/auth/register<br/>/auth/session<br/>/auth/logout"]
+    PageRoutes["Page Routes<br/>/<br/>/login<br/>/matrix<br/>/copilot<br/>/history"]
+    MatrixRoutes["Matrix Routes<br/>/api/matrix<br/>/api/matrix/categories<br/>/api/matrix/compare"]
+    DraftRoutes["Draft Routes<br/>/draft<br/>/api/draft/test-cases"]
+    HistoryRoute["History Route<br/>/api/history"]
+    SearchRoute["Search Route<br/>/api/oncology-search"]
+    Health["Health Route<br/>/health"]
   end
 
   subgraph Services[Service Layer]

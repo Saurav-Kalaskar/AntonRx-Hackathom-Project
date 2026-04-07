@@ -50,13 +50,13 @@ flowchart TB
   end
 
   subgraph API[API Layer - backend/main.py]
-    AuthEndpoints[/auth/config /auth/me /auth/login /auth/register /auth/session /auth/logout]
-    PageEndpoints[/ /login /matrix /copilot /history]
-    MatrixEndpoints[/api/matrix /api/matrix/categories /api/matrix/compare]
-    DraftEndpoints[/draft /api/draft/test-cases]
-    HistoryEndpoint[/api/history]
-    SearchEndpoint[/api/oncology-search]
-    HealthEndpoint[/health]
+    AuthEndpoints["Auth Endpoints<br/>/auth/config<br/>/auth/me<br/>/auth/login<br/>/auth/register<br/>/auth/session<br/>/auth/logout"]
+    PageEndpoints["Page Endpoints<br/>/<br/>/login<br/>/matrix<br/>/copilot<br/>/history"]
+    MatrixEndpoints["Matrix Endpoints<br/>/api/matrix<br/>/api/matrix/categories<br/>/api/matrix/compare"]
+    DraftEndpoints["Draft Endpoints<br/>/draft<br/>/api/draft/test-cases"]
+    HistoryEndpoint["History Endpoint<br/>/api/history"]
+    SearchEndpoint["Search Endpoint<br/>/api/oncology-search"]
+    HealthEndpoint["Health Endpoint<br/>/health"]
   end
 
   subgraph Services[Service Layer]
