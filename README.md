@@ -1,244 +1,177 @@
-# AntonRx Hackathom Project
+# AntonRx Hackathon Project
 
 ## Time-to-Therapy Prior Authorization Copilot
 
-### What Major Problem This Solves
-Specialty medication prior authorization (PA) is slow, manual, and policy-fragmented across payers. Teams often lose time searching long policy documents, comparing criteria payer by payer, and drafting appeal or authorization letters under tight timelines.
+A FastAPI-based clinician workflow tool that combines:
+- coverage matrix comparison across payers,
+- policy-grounded PA draft generation,
+- draft history persistence and review.
 
-This project targets that bottleneck by reducing time-to-therapy for patients through:
-- fast cross-payer policy comparison,
-- evidence-grounded policy retrieval,
-- and automated PA drafting with source attribution.
+It is implemented as a single deployable web app: backend APIs + static frontend pages served from the same service.
 
-## How We Solve It
-The application combines three capabilities in one workflow:
+## What Problem This Solves
+Specialty medication prior authorization is slow and fragmented across payer policies. Teams lose time comparing criteria, finding evidence, and drafting letters under pressure.
 
-1. Coverage Matrix
-- Presents side-by-side payer coverage criteria.
-- Uses backend policy extraction and filtering logic, not hardcoded matrix payloads.
-- Supports query and payer filtering for targeted review.
+Time-to-Therapy reduces that cycle by:
+- indexing payer policy documents for retrieval,
+- exposing searchable matrix views for policy comparison,
+- generating draft letters with retrieved policy evidence,
+- preserving draft history for follow-up and auditability.
 
-2. Copilot Drafting
-- Accepts patient context and payer target.
-- Retrieves relevant policy evidence from indexed policy documents using semantic retrieval.
-- Generates a PA draft grounded in retrieved clauses.
-- Returns explicit no-data behavior when evidence is missing: `Policy data not found in current coverage index.`
+## Current Feature Set
 
-3. Draft History
-- Stores generated drafts and supporting retrieved rules.
-- Enables review of prior requests and evidence used.
+### 1) Coverage Matrix
+- Dynamic rows built from indexed policy records (not hardcoded payloads).
+- Query, payer, and category filtering.
+- Cross-payer comparison snapshot endpoint.
+- Oncology drug info lookup helper endpoint.
+- Export of filtered rows from UI.
 
-## What We Use To Solve It
-### Backend
-- FastAPI for API and page serving.
-- Qdrant (in-memory) as vector database for policy chunk retrieval.
-- Deterministic embedding pipeline for semantic policy search.
-- SQLite for draft persistence and history.
-- OpenAI-compatible NVIDIA NIM endpoint for Nemotron generation.
+### 2) Copilot Drafting
+- Uses patient context + payer target.
+- Retrieves top policy evidence from in-memory vector index.
+- Generates draft through NVIDIA Nemotron endpoint.
+- Returns deterministic no-data sentinel when no policy evidence is found.
+- Supports PDF/CSV export from frontend.
 
-### Frontend
-- HTML/CSS/JavaScript pages under `site/public`.
-- Tailwind CSS for styling.
-- Direct integration with backend APIs for matrix, draft, and history.
+### 3) Draft History
+- Persists generated drafts, context, and retrieved rules in SQLite.
+- Lists history in reverse chronological order.
+- Supports detail review of selected draft and policy evidence.
 
-### Core Services
-- `RAGEngine` in `backend/pipeline/rag_engine.py`
-- `PADrafter` in `backend/generator/drafter.py`
-- API routes in `backend/main.py`
+### 4) Authentication
+- Auth is enabled by default.
+- Default mode is local credential auth (register/login).
+- Optional Auth0 mode activates when Auth0 env vars are fully configured.
+- Protected routes redirect unauthenticated users to `/login`.
 
-## Architecture Diagrams
-### High-Level Architecture
-```mermaid
-flowchart LR
-  Clinician["Clinician User"]
-  Frontend["Frontend Web UI<br/>Matrix, Copilot, History"]
-  Backend["Backend API Layer<br/>FastAPI"]
-  VectorDB["Vector DB<br/>Qdrant In-Memory Index"]
-  AppDB["Application DB<br/>SQLite History"]
-  PolicyDocs["Policy Corpus<br/>Document Files"]
-  LLM["LLM Inference Service<br/>NVIDIA NIM"]
+## Tech Stack
+- Backend: FastAPI, Pydantic, httpx
+- Retrieval: Qdrant client (in-memory), deterministic hashed embeddings
+- LLM: NVIDIA NIM Nemotron via OpenAI-compatible client
+- Storage: SQLite (`backend/history.db`)
+- Frontend: HTML, Tailwind CDN, vanilla JavaScript
+- Runtime packaging: Docker
 
-  Clinician --> Frontend
-  Frontend --> Backend
-  Backend --> VectorDB
-  Backend --> AppDB
-  Backend --> PolicyDocs
-  Backend --> LLM
-  Backend --> Frontend
+## Repository Layout (Key Paths)
+- [backend/main.py](backend/main.py) - app entrypoint, routes, auth/session wiring
+- [backend/auth.py](backend/auth.py) - auth provider selection, token/session validation
+- [backend/pipeline/rag_engine.py](backend/pipeline/rag_engine.py) - indexing, retrieval, matrix construction
+- [backend/generator/drafter.py](backend/generator/drafter.py) - LLM draft generation and fallback behavior
+- [backend/qa_smoke_test.py](backend/qa_smoke_test.py) - end-to-end smoke checks
+- [site/public/matrix.html](site/public/matrix.html) - coverage matrix UI
+- [site/public/copilot.html](site/public/copilot.html) - drafting UI
+- [site/public/history.html](site/public/history.html) - history UI
+- [site/public/login.html](site/public/login.html) - login/registration UI
+- [site/public/auth.js](site/public/auth.js) - client auth bootstrap + protected API behavior
+- [PROJECT_ARCHITECTURE.md](PROJECT_ARCHITECTURE.md) - detailed architecture document
+
+## Environment Setup
+Copy the template and set values:
+
+```bash
+cp .env.example .env
 ```
 
-### Low-Level Architecture
-```mermaid
-flowchart TB
-  subgraph FrontendLayer["Frontend Layer"]
-    MatrixPage["matrix.html<br/>Coverage comparison"]
-    CopilotPage["copilot.html<br/>PA drafting workflow"]
-    HistoryPage["history.html<br/>Draft history review"]
-  end
-
-  subgraph APILayer["Backend API Layer - backend/main.py"]
-    HealthAPI["GET /health"]
-    MatrixAPI["GET /api/matrix<br/>GET /api/matrix/compare<br/>GET /api/matrix/categories"]
-    DraftAPI["POST /draft"]
-    HistoryAPI["GET /api/history"]
-    PolicyFileAPI["GET /policies/:filename"]
-  end
-
-  subgraph ServiceLayer["Service Layer"]
-    RAG["RAGEngine<br/>backend/pipeline/rag_engine.py"]
-    Drafter["PADrafter<br/>backend/generator/drafter.py"]
-    Env["env_loader.py"]
-  end
-
-  subgraph DataLayer["Data Layer"]
-    PolicyFiles["backend/pipeline/documents"]
-    Schema["backend/schema/policy.json"]
-    DLQ["backend/pipeline/dlq.jsonl"]
-    VectorIndex["Qdrant Vector Index"]
-    DraftHistory["backend/history.db"]
-  end
-
-  subgraph ExternalLayer["External Dependency"]
-    Nemotron["NVIDIA Nemotron<br/>OpenAI-Compatible Endpoint"]
-  end
-
-  MatrixPage --> MatrixAPI
-  CopilotPage --> DraftAPI
-  CopilotPage --> MatrixAPI
-  HistoryPage --> HistoryAPI
-
-  HealthAPI --> RAG
-  MatrixAPI --> RAG
-  DraftAPI --> RAG
-  DraftAPI --> Drafter
-  DraftAPI --> DraftHistory
-  HistoryAPI --> DraftHistory
-  PolicyFileAPI --> PolicyFiles
-
-  RAG --> PolicyFiles
-  RAG --> Schema
-  RAG --> DLQ
-  RAG --> VectorIndex
-  Drafter --> Nemotron
-  Env --> APILayer
-```
-
-## Data: What It Is and Where It Is Accessed
-### Source Policy Data
-Policy documents are loaded from:
-- `backend/pipeline/documents/`
-
-Current examples include payer policy text files (Aetna, UHC, Cigna).
-
-### Extracted and Indexed Data
-- Policy chunks are parsed and embedded into Qdrant for retrieval.
-- Extracted policy records are validated against schema:
-  - `backend/schema/policy.json`
-- Validation failures are written to a dead-letter queue file:
-  - `backend/pipeline/dlq.jsonl`
-
-### Persisted Application Data
-- Draft history is persisted to SQLite:
-  - `backend/history.db`
-
-## Request/Response Flow
-1. User opens `matrix`, `copilot`, or `history` page.
-2. Frontend calls backend APIs (`/api/matrix`, `/draft`, `/api/history`).
-3. Backend retrieves policy evidence from vector index and/or database.
-4. Backend returns structured data with source metadata.
-5. UI renders response and citations.
-
-## API Endpoints
-- `GET /health`
-  - Health and indexing status.
-- `GET /auth/config`
-  - Returns frontend-safe authentication settings.
-- `GET /api/matrix?query=<text>&payer=<name>`
-  - Returns coverage rows derived from indexed policy records.
-- `POST /draft`
-  - Generates PA draft from patient context and retrieved policy evidence.
-- `GET /api/history`
-  - Returns stored draft history.
-- `GET /policies/<filename>`
-  - Serves source policy files used in citations.
-
-## Environment Configuration
-Create a root `.env` file (already supported by project env loader):
+Primary variables (see [.env.example](.env.example) for full list):
 
 ```env
-NVIDIA_API_KEY=your_key_here
+NVIDIA_API_KEY=
 STRICT_LLM_MODE=true
-ALLOWED_ORIGINS=https://frontend-app.example
+ALLOWED_ORIGINS=http://localhost:8005,http://127.0.0.1:8005
 
-# Auth0 (set AUTH_ENABLED=true to enforce login)
 AUTH_ENABLED=true
-AUTH0_DOMAIN=tenant-name.region.auth0.com
-AUTH0_CLIENT_ID=your_auth0_spa_client_id
-AUTH0_AUDIENCE=your_backend_api_identifier
+AUTH0_DOMAIN=
+AUTH0_CLIENT_ID=
+AUTH0_AUDIENCE=
 AUTH0_CALLBACK_PATH=/auth/callback
 AUTH0_LOGOUT_RETURN_PATH=/login
+
+APP_SESSION_SECRET=
+SESSION_TTL_SECONDS=28800
+SESSION_COOKIE_SECURE=false
 ```
 
-Notes:
-- In strict mode, missing/failed LLM calls raise runtime errors.
-- `.env` is excluded from git; use `.env.example` as template.
+## Run Locally
 
-### Auth0 Sign In + Create Account Flow
-- Startup route behavior:
-  - If `AUTH_ENABLED=true`, app entry redirects to `/login`.
-  - If `AUTH_ENABLED=false`, app entry redirects to `/matrix`.
-- `login.html` provides two clinician actions:
-  - `Sign In` (Auth0 login redirect)
-  - `Create Account` (Auth0 signup redirect with `screen_hint=signup`)
-- When authenticated, frontend pages call protected backend APIs using Bearer tokens from Auth0.
-- Backend verifies Auth0 JWTs on protected routes using issuer, audience, and Auth0 JWKS.
+### 1) Install dependencies
 
-## Local Run
-1. Install dependencies:
 ```bash
 python -m pip install -r backend/aws_deployment_config/requirements.txt
 ```
 
-2. Start the backend:
+### 2) Start the app
+
 ```bash
 python -m uvicorn backend.main:app --host 0.0.0.0 --port 8005
 ```
 
-3. Access frontend routes served by backend:
-- Frontend route: `/matrix`
-- Frontend route: `/copilot`
-- Frontend route: `/history`
+### 3) Open in browser
+- http://localhost:8005/login
+- After auth, navigate to:
+  - `/matrix`
+  - `/copilot`
+  - `/history`
 
-## Production Deploy (Public URL)
-- Recommended path for this architecture: Google Cloud Run.
-- Step-by-step instructions: `DEPLOY_GCP_CLOUD_RUN.md`
+## API Quick Reference
+
+Auth/session:
+- `GET /auth/config`
+- `GET /auth/me`
+- `POST /auth/register`
+- `POST /auth/login`
+- `POST /auth/session`
+- `POST /auth/logout`
+
+Core APIs:
+- `GET /health`
+- `GET /api/matrix`
+- `GET /api/matrix/categories`
+- `GET /api/matrix/compare`
+- `GET /api/oncology-search`
+- `POST /draft`
+- `GET /api/history`
+- `GET /api/draft/test-cases`
 
 ## QA and Verification
-Run automated smoke tests:
+Run smoke tests:
 
 ```bash
 python backend/qa_smoke_test.py
 ```
 
-The suite verifies:
-- page routes,
-- API health,
-- matrix filtering,
-- known/unknown draft behavior,
+The smoke suite validates:
+- auth flow and route protection,
+- matrix retrieval/filter/compare/category behavior,
+- known vs unknown draft behavior,
 - history persistence,
-- and frontend-to-backend wiring assertions.
+- frontend-to-backend wiring.
 
-## Repository Structure (Key Paths)
-- `backend/main.py` - API + Frontend route entrypoint
-- `backend/pipeline/rag_engine.py` - policy parsing, indexing, retrieval
-- `backend/generator/drafter.py` - draft generation
-- `backend/qa_smoke_test.py` - regression checks
-- `site/public/matrix.html` - matrix UI
-- `site/public/copilot.html` - drafting UI
-- `site/public/history.html` - history UI
+Optional direct draft-generation check:
 
-## Scope and Current Constraints
-- Vector index is in-memory at runtime.
-- Policy corpus is based on local document files.
-- Real-time payer API integration is out of scope for this version.
-- This is designed for deterministic policy-grounded retrieval, not general medical advice.
+```bash
+python test_nemotron.py
+```
+
+## Docker
+Build and run:
+
+```bash
+docker build -t antorx-time-to-therapy .
+docker run --rm -p 8080:8080 --env-file .env antorx-time-to-therapy
+```
+
+Container entrypoint is defined in [Dockerfile](Dockerfile).
+
+## Production Deployment
+For Google Cloud Run deployment steps, use:
+- [DEPLOY_GCP_CLOUD_RUN.md](DEPLOY_GCP_CLOUD_RUN.md)
+
+Live production URL:
+- https://time-to-therapy-4todzcphia-uc.a.run.app/
+
+## Known Constraints
+- Vector index is in-memory and rebuilt on restart.
+- SQLite is local-file based; on Cloud Run, local filesystem is ephemeral.
+- Policy extraction is heuristic and depends on source document structure.
+- This project supports policy-grounded workflow assistance and is not medical advice.

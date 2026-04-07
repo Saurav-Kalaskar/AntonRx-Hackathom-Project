@@ -1,222 +1,260 @@
 # Time-to-Therapy Prior Authorization Copilot
-## Project Architecture Document
+## Project Architecture (Current Implementation)
 
-### Overview
-The Time-to-Therapy Prior Authorization Copilot is a deterministic, enterprise-grade Medical Benefit Drug Policy Tracker engineered to solve an administrative healthcare bottleneck. It allows market access analysts to visualize coverage rules side-by-side (Matrix) and autonomously draft Prior Authorization appeal letters (Copilot) with Explainable AI attribution.
+## 1. Purpose
+Time-to-Therapy is a FastAPI + static web application for prior-authorization workflows.
 
-### Core Purpose
-- **Problem Solved**: Administrative delays in prior authorization processes for specialty medications
-- **Solution**: AI-powered system that provides real-time coverage comparisons and automates PA letter generation
-- **Target Users**: Market access analysts, healthcare administrators, clinical pharmacists
-- **Key Value Proposition**: Reduces "Time-to-Therapy" by providing instant access to payer policies and automating documentation
+It provides:
+- payer policy comparison via a searchable matrix,
+- AI-assisted PA draft generation grounded in indexed policy text,
+- persisted draft history for review and auditability.
 
-### System Architecture
+The current implementation is optimized for deterministic policy retrieval and demo-ready deployment, with local credential auth as default and optional Auth0 SSO.
 
-#### 1. Technology Stack
-- **Frontend**: Static HTML/CSS/JavaScript with Tailwind CSS
-- **Backend**: Python/FastAPI API server
-- **Database**: SQLite for persistence (history.db)
-- **Vector Database**: Qdrant (in-memory) for RAG implementation
-- **Embedding Model**: NVIDIA NIM nv-embedqa-e5-v5 (via API, no local downloads)
-- **LLM**: Nvidia Nemotron-3-Super-120B (via NVIDIA API)
-- **Document Processing**: PyPDF2 for PDF text extraction
+## 2. System Overview
 
-#### 2. Component Breakdown
+### Runtime topology
+- Single FastAPI service in [backend/main.py](backend/main.py)
+- Static frontend served by backend from [site/public](site/public)
+- Policy source files served by backend from [backend/pipeline/documents](backend/pipeline/documents)
+- In-memory Qdrant vector index built at process startup
+- SQLite database for users and draft history at [backend/history.db](backend/history.db)
 
-##### Frontend Components
-- **Matrix View** (`site/public/matrix.html`): Cross-payer coverage comparison table
-- **Copilot View** (`site/public/copilot.html`): AI-powered PA letter drafting interface
-- **History View** (`site/public/history.html`): PA request history tracking
-- **Shared Elements**:
-  - TopAppBar with navigation
-  - BottomNavBar for mobile navigation
-  - Consistent design system using Tailwind CSS
-  - Custom JavaScript for API interactions and DOM manipulation
+### Core technologies
+- Backend: FastAPI, Starlette middleware, Pydantic
+- Retrieval: Qdrant client (local in-memory collection)
+- Draft generation: OpenAI-compatible client against NVIDIA NIM Nemotron endpoint
+- Persistence: SQLite (single file)
+- Frontend: HTML + Tailwind CDN + vanilla JS
 
-##### Backend Components
-- **API Server** (`backend/main.py`): FastAPI application serving REST endpoints
-- **PA Drafter** (`backend/generator/drafter.py`): LLM-powered PA letter generation
-- **RAG Engine** (`backend/pipeline/rag_engine.py`): Vector search over policy documents
-- **Document Processor** (`backend/pipeline/document_processor.py`): PDF/TXT text extraction
-- **Ingestion Pipeline** (`backend/pipeline/ingestion.py`): Data validation and processing
+## 3. Layered Architecture
 
-##### Data Storage
-- **SQLite Database** (`history.db`): Stores PA draft history
-- **Vector Database** (Qdrant in-memory): Stores embedded policy document chunks
-- **Policy Documents**: Stored in `backend/pipeline/documents/` directory
+### Frontend layer
+Primary pages:
+- [site/public/login.html](site/public/login.html)
+- [site/public/matrix.html](site/public/matrix.html)
+- [site/public/copilot.html](site/public/copilot.html)
+- [site/public/history.html](site/public/history.html)
 
-#### 3. Data Flow
+Shared client auth/bootstrap:
+- [site/public/auth.js](site/public/auth.js)
 
-##### PA Letter Generation Flow
-1. User enters patient context (name, diagnosis, medication, payer) in Copilot interface
-2. Frontend sends POST request to `/draft` endpoint with patient context
-3. Backend:
-   - Creates query from diagnosis + medication
-   - Uses RAG engine to search vector database for relevant policy sections
-   - Initializes PADrafter with payer name, patient context, and retrieved rules
-   - PADrafter constructs prompt for LLM using retrieved rules as context
-   - LLM (Nemotron-3-Super-120b) generates PA letter draft
-   - Draft saved to SQLite history database
-   - Draft returned to frontend for display
+Key frontend behaviors:
+- same-origin API calls for session + protected endpoints,
+- route guard bootstrap for authenticated pages,
+- matrix filtering/comparison/category/export,
+- draft export (PDF/CSV),
+- history list/detail rendering from backend data.
 
-##### Matrix Data Flow
-1. Frontend loads matrix.html
-2. JavaScript fetches data from `/api/matrix` endpoint on page load
-3. Backend returns hardcoded matrix data (payer, medication, status, match score)
-4. Frontend renders table with status-based styling (color-coded badges)
+### API/application layer
+Entrypoint:
+- [backend/main.py](backend/main.py)
 
-##### History Data Flow
-1. Frontend loads history.html
-2. JavaScript fetches data from `/api/history` endpoint on page load
-3. Backend queries SQLite database for all PA draft records
-4. Returns JSON array of history entries
-5. Frontend renders history cards with click-to-expand detail view
+Responsibilities:
+- static and policy-file hosting,
+- auth/session endpoints,
+- page route protection and redirects,
+- matrix/search/draft/history APIs,
+- SQLite initialization + lightweight schema migration,
+- integration of RAG retrieval and drafting.
 
-#### 4. Key Features Implementation
+### Retrieval layer
+Core engine:
+- [backend/pipeline/rag_engine.py](backend/pipeline/rag_engine.py)
 
-##### Deterministic Policy Processing
-- **Exclusion Filtering**: Heuristic patterns drop Medicare/Medicaid/standard pharmacy benefit data
-- **Schema Validation**: Strict validation against medical benefit drug policy JSON schema
-- **Dead-Letter Queue**: Failed validations sent to DLQ for manual review
-- **Source Attribution**: All AI-generated content includes citations to source documents
+Responsibilities:
+- load TXT/PDF policy corpus,
+- sanitize excluded content patterns,
+- extract policy records from parsed sections,
+- validate extracted records against schema,
+- write invalid extractions to DLQ,
+- build deterministic hashed embeddings,
+- upsert chunks into in-memory Qdrant,
+- serve semantic search + matrix rows + category lists.
 
-##### Explainable AI Attribution
-- **Retrieved Context Display**: Shows which policy sections were used for generation
-- **Citation Format**: [Source, Page X, Para Y]: [text] format in RAG engine
-- **Confidence Indicators**: Match scores in matrix view (0-1 scale converted to percentage)
+Support utilities (not primary runtime path):
+- [backend/pipeline/document_processor.py](backend/pipeline/document_processor.py)
+- [backend/pipeline/ingestion.py](backend/pipeline/ingestion.py)
 
-##### Design System Compliance
-- **Color Palette**: 
-  - Background: Crisp whites (#f7f9fb)
-  - Primary: Soft teals (#00685d, #71f8e4)
-  - Secondary: Slate blues (#191c1e, #d5e3fc)
-  - Alerts: Amber (#ffbf00) and soft coral (#f88379) for blockers/warnings
-- **Typography**: 
-  - Headlines: Manrope
-  - Body: Inter
-- **Components**: shadcn-ui inspired (Cards, Tables, Badges, Buttons)
-- **Layout**: Information dense with minimized cognitive load
-- **Aesthetics**: Rounded boundaries (`rounded-lg` or `md`), glass-panel effects
+### Generation layer
+PA drafting service:
+- [backend/generator/drafter.py](backend/generator/drafter.py)
 
-#### 5. API Endpoints
+Responsibilities:
+- compose a policy-grounded prompt,
+- call Nemotron via NVIDIA-compatible OpenAI API,
+- return strict-mode failures when configured,
+- provide deterministic fallback letter when strict mode is off and LLM is unavailable.
 
-##### POST `/draft`
-- **Description**: Generate Prior Authorization draft letter
-- **Request Body**:
-  ```json
-  {
-    "payer_name": "string",
-    "patient_context": {
-      "patient_name": "string",
-      "diagnosis": "string", 
-      "medication": "string"
-    },
-    "retrieved_rules": []
-  }
-  ```
-- **Response**: 
-  ```json
-  {
-    "draft": "string",
-    "retrieved_rules": [
-      {
-        "text": "string",
-        "source": "string",
-        "chunk_index": "integer",
-        "score": "float (0-1)"
-      }
-    ],
-    "payer_name": "string"
-  }
-  ```
+### Data layer
+- SQLite DB: [backend/history.db](backend/history.db)
+- Policy schema: [backend/schema/policy.json](backend/schema/policy.json)
+- Dead-letter queue: [backend/pipeline/dlq.jsonl](backend/pipeline/dlq.jsonl)
+- Policy files: [backend/pipeline/documents](backend/pipeline/documents)
 
-##### GET `/api/history`
-- **Description**: Retrieve PA draft history
-- **Response**: 
-  ```json
-  {
-    "history": [
-      {
-        "id": "integer",
-        "payer_name": "string",
-        "patient_context": "object",
-        "draft_content": "string",
-        "retrieved_rules": "array",
-        "timestamp": "string"
-      }
-    ]
-  }
-  ```
+## 4. Authentication and Session Model
 
-##### GET `/api/matrix`
-- **Description**: Get coverage matrix data
-- **Response**: 
-  ```json
-  {
-    "matrix": [
-      {
-        "payer": "string",
-        "medication": "string", 
-        "indication": "string",
-        "status": "string",
-        "requirements": "string",
-        "score": "number (0-1)"
-      }
-    ]
-  }
-  ```
+Auth behavior is environment-driven from [backend/auth.py](backend/auth.py):
+- `AUTH_ENABLED=true` by default.
+- Provider auto-selection:
+  - `auth0` when all Auth0 settings are present,
+  - `local` when Auth0 is not fully configured,
+  - `none` only when auth is disabled.
 
-##### GET `/health`
-- **Description**: Health check endpoint
-- **Response**: 
-  ```json
-  {
-    "status": "string",
-    "rag_ready": "boolean",
-    "model": "string"
-  }
-  ```
+### Local auth mode (default)
+- `POST /auth/register` creates local users in `app_users`.
+- `POST /auth/login` validates credentials.
+- Password storage: PBKDF2-HMAC-SHA256 with per-user salt.
+- Session cookie: signed token (`ttt_session`) using HMAC-SHA256.
 
-#### 6. Security & Compliance Considerations
-- **Data Privacy**: No PHI stored permanently; demo data only
-- **API Security**: CORS enabled for local development only
-- **Key Management**: NVIDIA API key configured via environment
-- **Audit Trail**: All PA drafts saved with timestamps
-- **Explainability**: Source citations provided for all AI-generated content
+### Auth0 mode (optional)
+- Bearer JWT verification against Auth0 JWKS.
+- Session establishment through `POST /auth/session`.
+- Same session cookie mechanism used after backend session creation.
 
-#### 7. Deployment & Setup
-- **Local Development**: 
-  - Backend: `uvicorn backend.main:app --host 0.0.0.0 --port 8005`
-  - Frontend: Accessible via `/site/public/` path on backend
-- **Dependencies**: 
-  - Python: fastapi, uvicorn, openai, qdrant-client, sentence-transformers
-  - Frontend: Tailwind CSS (via CDN)
-- **Environment Variables**:
-  - `FASTEMBED_CACHE_PATH`: "./fastembed_cache"
-  - `HF_HUB_ENABLE_HF_TRANSFER`: "0"
-  - `HF_HUB_DISABLE_FAST_DOWNLOAD`: "1"
-  - `NVIDIA_API_KEY`: "your-nvidia-api-key-here"
+### Route protection
+- Protected HTML routes redirect unauthenticated users to `/login`:
+  - `/matrix`, `/copilot`, `/history`
+- Static HTML under `/static/*.html` is also protected via middleware when auth is enabled.
 
-#### 8. Limitations & Future Improvements
-**Current Limitations**:
-- Matrix data is hardcoded (not real-time)
-- Vector database is in-memory (not persistent)
-- LLM API key requires manual configuration
-- No user authentication/authorization
-- Limited policy document processing (basic text extraction)
-- Mock fallback when LLM API unavailable
+## 5. Startup and Initialization
+On process startup ([backend/main.py](backend/main.py)):
+- environment variables are loaded once from `.env` via [backend/env_loader.py](backend/env_loader.py),
+- fastembed/cache-related env vars are set before vector dependencies,
+- static mounts are configured:
+  - `/static` -> [site/public](site/public)
+  - `/policies` -> [backend/pipeline/documents](backend/pipeline/documents)
+- `RAGEngine` is initialized and indexes available policy docs,
+- SQLite tables are ensured:
+  - `pa_drafts` with migration to add `retrieved_rules` when missing,
+  - `app_users` for local auth.
 
-**Planned Enhancements**:
-- Connect to real payer APIs for live matrix data
-- Persistent vector database implementation
-- Secure key management (environment variables/vault)
-- User authentication and role-based access
-- Advanced NLP for better policy data extraction
-- Feedback loop to improve AI accuracy
-- Multi-language support
-- Integration with EHR/PM systems
+## 6. Primary Data Flows
 
-### Conclusion
-The Time-to-Therapy Prior Authorization Copilot demonstrates a viable approach to reducing administrative burden in healthcare prior authorization processes. By combining deterministic policy processing with AI-powered document generation, the system provides market access analysts with both visibility into coverage rules and automation of documentation tasks. The architecture follows modern microservices principles with clear separation of concerns between frontend presentation, backend logic, and AI/ML components.
+### A. Matrix flow
+1. UI calls `GET /api/matrix` with optional `query`, `payer`, `category`.
+2. Backend delegates to `RAGEngine.build_matrix(...)`.
+3. Engine returns rows derived from parsed policy records (not hardcoded payloads).
+4. UI renders summary, detailed rows, and exportable data.
 
-The system is designed to be extensible, allowing for integration with real healthcare data sources and enterprise systems while maintaining the core value proposition of reducing Time-to-Therapy through intelligent automation and explainable AI.
+Related matrix endpoints:
+- `GET /api/matrix/categories`
+- `GET /api/matrix/compare`
+
+### B. Draft flow
+1. UI submits `POST /draft` with payer + patient context.
+2. Backend builds retrieval query and runs semantic search over vector index.
+3. If no evidence is found, response draft is:
+   - `Policy data not found in current coverage index.`
+4. If evidence exists, backend invokes `PADrafter.generate_draft()`.
+5. Draft + context are persisted to `pa_drafts` and returned.
+
+### C. History flow
+1. UI calls `GET /api/history`.
+2. Backend returns drafts ordered by timestamp descending.
+3. UI renders selectable records with rule/draft detail panes.
+
+### D. Drug information helper flow
+1. UI calls `GET /api/oncology-search?drug=...`.
+2. Backend attempts local policy index match first.
+3. If no local match, backend attempts OpenFDA lookup.
+4. If still no match, backend returns a DailyMed search URL fallback.
+
+## 7. API Surface (Current)
+
+Public/session/bootstrap:
+- `GET /`
+- `GET /login`
+- `GET /auth/callback`
+- `GET /auth/config`
+- `GET /auth/me`
+- `POST /auth/login`
+- `POST /auth/register`
+- `POST /auth/session`
+- `POST /auth/logout`
+
+Protected application pages:
+- `GET /matrix`
+- `GET /copilot`
+- `GET /history`
+
+Protected APIs:
+- `GET /api/matrix`
+- `GET /api/matrix/categories`
+- `GET /api/matrix/compare`
+- `GET /api/oncology-search`
+- `GET /api/draft/test-cases`
+- `POST /draft`
+- `GET /api/history`
+
+Operational:
+- `GET /health`
+
+Static/document mounts:
+- `GET /static/*`
+- `GET /policies/*`
+
+## 8. Configuration
+Reference template:
+- [.env.example](.env.example)
+
+Key variables:
+- `NVIDIA_API_KEY`
+- `STRICT_LLM_MODE`
+- `ALLOWED_ORIGINS`
+- `AUTH_ENABLED`
+- `AUTH0_DOMAIN`
+- `AUTH0_CLIENT_ID`
+- `AUTH0_AUDIENCE`
+- `AUTH0_CALLBACK_PATH`
+- `AUTH0_LOGOUT_RETURN_PATH`
+- `APP_SESSION_SECRET`
+- `SESSION_TTL_SECONDS`
+- `SESSION_COOKIE_SECURE`
+
+## 9. Deployment Model
+
+### Local
+- Run with Uvicorn: `uvicorn backend.main:app --host 0.0.0.0 --port 8005`
+- Static frontend served from same backend service.
+
+### Container
+- Docker runtime defined in [Dockerfile](Dockerfile)
+- Installs Python deps from [backend/aws_deployment_config/requirements.txt](backend/aws_deployment_config/requirements.txt)
+- Exposes `PORT` (default 8080)
+
+### Cloud Run guidance
+- Deployment walkthrough in [DEPLOY_GCP_CLOUD_RUN.md](DEPLOY_GCP_CLOUD_RUN.md)
+- Live production endpoint: https://time-to-therapy-4todzcphia-uc.a.run.app/
+- Current persistence caveat: SQLite is ephemeral on Cloud Run instances.
+
+### Production deployment diagram
+```mermaid
+flowchart LR
+  User[Clinician Browser] --> Prod[Cloud Run Service\nhttps://time-to-therapy-4todzcphia-uc.a.run.app/]
+  Prod --> FastAPI[FastAPI App]
+  FastAPI --> Static[Static Frontend\n/site/public]
+  FastAPI --> APIs[Protected APIs\n/matrix /copilot /history /api/*]
+  FastAPI --> RAG[RAG Engine + In-memory Qdrant]
+  FastAPI --> DB[SQLite\nbackend/history.db]
+```
+
+## 10. Validation and QA
+Automated smoke tests:
+- [backend/qa_smoke_test.py](backend/qa_smoke_test.py)
+
+Smoke coverage includes:
+- auth and route protection,
+- matrix filters/categories/compare,
+- draft known vs unknown behavior,
+- history persistence path,
+- frontend wiring assertions for key pages.
+
+## 11. Known Constraints
+- Vector index is in-memory and rebuilt on restart.
+- Local SQLite is not production-persistent in serverless ephemeral environments.
+- Deterministic hashing embeddings are lightweight and fast, but less semantically rich than large embedding models.
+- Policy extraction relies on section/heading heuristics and source format consistency.
+
+## 12. Architectural Summary
+The current architecture is a single-service, production-demo-friendly design: deterministic policy ingestion/retrieval, policy-grounded draft generation, and a protected clinician-facing UI. It favors reliability and explainability for hackathon workflows while keeping extension paths open for managed databases, persistent vector stores, and enterprise SSO hardening.
